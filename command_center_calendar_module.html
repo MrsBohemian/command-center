@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Command Center Calendar Module</title>
+  <style>
+    :root{
+      --bg:#0b1020;
+      --panel:#121a30;
+      --panel-2:#182240;
+      --line:#2e3b66;
+      --text:#e8eefc;
+      --muted:#a9b7df;
+      --accent:#78a9ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .wrap{
+      width:100vw;
+      height:100vh;
+      display:flex;
+      flex-direction:column;
+      padding:14px;
+      gap:10px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)),
+        var(--bg);
+    }
+    .header{
+      display:grid;
+      grid-template-columns: 140px repeat(7, 1fr);
+      gap:8px;
+      align-items:stretch;
+      min-height:52px;
+    }
+    .corner{
+      border:1px solid var(--line);
+      background:var(--panel);
+      border-radius:10px;
+    }
+    .day{
+      border:1px solid var(--line);
+      background:var(--panel);
+      border-radius:10px;
+      padding:10px 8px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      min-width:0;
+    }
+    .day .dow{
+      font-size:13px;
+      color:var(--muted);
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:2px;
+    }
+    .day .date{
+      font-size:20px;
+      font-weight:700;
+      color:var(--text);
+      line-height:1.1;
+    }
+    .row{
+      display:grid;
+      grid-template-columns: 140px repeat(7, 1fr);
+      gap:8px;
+      flex:1 1 0;
+      min-height:0;
+    }
+    .label{
+      border:1px solid var(--line);
+      background:var(--panel-2);
+      border-radius:10px;
+      padding:14px 12px;
+      font-size:20px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+    }
+    .box{
+      border:1px solid var(--line);
+      background:var(--panel);
+      border-radius:10px;
+      padding:8px;
+      min-width:0;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    ul{
+      list-style:none;
+      margin:0;
+      padding:0;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+    li{
+      background:rgba(120,169,255,.08);
+      border:1px solid rgba(120,169,255,.18);
+      border-radius:8px;
+      padding:6px 7px;
+      font-size:13px;
+      line-height:1.25;
+      min-width:0;
+      word-wrap:break-word;
+      overflow-wrap:anywhere;
+    }
+    .time{
+      color:var(--accent);
+      font-weight:700;
+      margin-right:6px;
+      white-space:nowrap;
+    }
+    .empty{
+      color:var(--muted);
+      font-style:italic;
+      opacity:.8;
+      padding:6px 2px;
+    }
+    @media (max-width: 1200px){
+      .label{font-size:16px}
+      .day .date{font-size:16px}
+      li{font-size:12px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap" id="app"></div>
+
+  <script>
+    const scheduleData = {
+      "Handley Man": {
+        "2026-04-11": [],
+        "2026-04-12": [],
+        "2026-04-13": [
+          { title: "Start fence job (Wills)" },
+          { title: "Wills visit" }
+        ],
+        "2026-04-14": [
+          { title: "Wills visit" }
+        ],
+        "2026-04-15": [
+          { title: "Lead follow-up" },
+          { title: "Wills visit" }
+        ],
+        "2026-04-16": [
+          { title: "Wills visit" }
+        ],
+        "2026-04-17": [
+          { title: "Wills visit" }
+        ]
+      },
+      "Heaven": {
+        "2026-04-11": [
+          { title: "Kitchen ✓" },
+          { title: "Bots work" },
+          { title: "Respond to Yvette & Andy" },
+          { title: "Plan menu" },
+          { title: "Groceries (pending)" }
+        ],
+        "2026-04-12": [
+          { title: "Bots work" },
+          { title: "Groceries (if not done)" }
+        ],
+        "2026-04-13": [],
+        "2026-04-14": [
+          { title: "DoSeum field trip" }
+        ],
+        "2026-04-15": [
+          { title: "Bots work" }
+        ],
+        "2026-04-16": [
+          { time: "11:00 AM", title: "ARD meeting" }
+        ],
+        "2026-04-17": [
+          { title: "Guest speaker at UTSA" }
+        ]
+      },
+      "Daniel": {
+        "2026-04-11": [],
+        "2026-04-12": [],
+        "2026-04-13": [],
+        "2026-04-14": [],
+        "2026-04-15": [],
+        "2026-04-16": [],
+        "2026-04-17": []
+      }
+    };
+
+    const startDateStr = "2026-04-11";
+
+    function parseLocalDate(str){
+      const parts = str.split("-").map(Number);
+      return new Date(parts[0], parts[1]-1, parts[2]);
+    }
+
+    function formatKey(date){
+      const y = date.getFullYear();
+      const m = String(date.getMonth()+1).padStart(2,'0');
+      const d = String(date.getDate()).padStart(2,'0');
+      return y + "-" + m + "-" + d;
+    }
+
+    function addDays(date, days){
+      const copy = new Date(date);
+      copy.setDate(copy.getDate() + days);
+      return copy;
+    }
+
+    function formatHeader(date){
+      const dow = date.toLocaleDateString(undefined, { weekday:'short' });
+      const md = date.toLocaleDateString(undefined, { month:'numeric', day:'numeric' });
+      return { dow, md };
+    }
+
+    function timeSortValue(item){
+      if (!item.time) return "99:99";
+      const raw = item.time.trim().toUpperCase();
+      const match = raw.match(/^(\d{1,2}):?(\d{2})?\s*(AM|PM)$/);
+      if (!match) return raw;
+      let h = parseInt(match[1],10);
+      const m = parseInt(match[2] || "00",10);
+      const mer = match[3];
+      if (h === 12) h = 0;
+      if (mer === "PM") h += 12;
+      return String(h).padStart(2,'0') + ":" + String(m).padStart(2,'0');
+    }
+
+    function render(){
+      const app = document.getElementById("app");
+      app.innerHTML = "";
+
+      const startDate = parseLocalDate(startDateStr);
+      const dates = Array.from({length: 7}, (_,i) => addDays(startDate, i));
+
+      const header = document.createElement("div");
+      header.className = "header";
+
+      const corner = document.createElement("div");
+      corner.className = "corner";
+      header.appendChild(corner);
+
+      dates.forEach(date => {
+        const formatted = formatHeader(date);
+        const el = document.createElement("div");
+        el.className = "day";
+        el.innerHTML = '<div class="dow">' + formatted.dow + '</div><div class="date">' + formatted.md + '</div>';
+        header.appendChild(el);
+      });
+
+      app.appendChild(header);
+
+      Object.entries(scheduleData).forEach(([name, days]) => {
+        const row = document.createElement("div");
+        row.className = "row";
+
+        const label = document.createElement("div");
+        label.className = "label";
+        label.textContent = name;
+        row.appendChild(label);
+
+        dates.forEach(date => {
+          const key = formatKey(date);
+          const box = document.createElement("div");
+          box.className = "box";
+
+          const items = (days[key] || []).slice().sort((a,b) => {
+            const ta = timeSortValue(a);
+            const tb = timeSortValue(b);
+            return ta.localeCompare(tb);
+          });
+
+          if (!items.length){
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            empty.textContent = "";
+            box.appendChild(empty);
+          } else {
+            const ul = document.createElement("ul");
+            items.forEach(item => {
+              const li = document.createElement("li");
+              if (item.time){
+                li.innerHTML = '<span class="time">' + item.time + '</span>' + item.title;
+              } else {
+                li.textContent = item.title;
+              }
+              ul.appendChild(li);
+            });
+            box.appendChild(ul);
+          }
+
+          row.appendChild(box);
+        });
+
+        app.appendChild(row);
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
