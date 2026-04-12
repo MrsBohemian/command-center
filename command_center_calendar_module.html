@@ -6,13 +6,17 @@
   <title>Command Center Calendar Module</title>
   <style>
     :root{
-      --bg:#0b1020;
-      --panel:#121a30;
-      --panel-2:#182240;
-      --line:#2e3b66;
-      --text:#e8eefc;
-      --muted:#a9b7df;
-      --accent:#78a9ff;
+      --bg:#070b10;
+      --panel:#171f29;
+      --panel-2:#101720;
+      --line:#334355;
+      --text:#ffffff;
+      --muted:#b9c7d8;
+      --header:#6ee7ff;
+      --time:#ffd166;
+      --label:#f2f6fb;
+      --task-bg:#1e2935;
+      --task-border:#415467;
     }
     *{box-sizing:border-box}
     body{
@@ -28,25 +32,23 @@
       flex-direction:column;
       padding:14px;
       gap:10px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0)),
-        var(--bg);
+      background:var(--bg);
     }
     .header{
       display:grid;
-      grid-template-columns: 140px repeat(7, 1fr);
+      grid-template-columns: 150px repeat(7, 1fr);
       gap:8px;
       align-items:stretch;
-      min-height:52px;
+      min-height:62px;
     }
     .corner{
       border:1px solid var(--line);
-      background:var(--panel);
+      background:var(--panel-2);
       border-radius:10px;
     }
     .day{
       border:1px solid var(--line);
-      background:var(--panel);
+      background:var(--panel-2);
       border-radius:10px;
       padding:10px 8px;
       display:flex;
@@ -55,21 +57,22 @@
       min-width:0;
     }
     .day .dow{
-      font-size:13px;
-      color:var(--muted);
+      font-size:15px;
+      color:var(--header);
       text-transform:uppercase;
       letter-spacing:.08em;
-      margin-bottom:2px;
+      margin-bottom:4px;
+      font-weight:700;
     }
     .day .date{
-      font-size:20px;
+      font-size:22px;
       font-weight:700;
       color:var(--text);
       line-height:1.1;
     }
     .row{
       display:grid;
-      grid-template-columns: 140px repeat(7, 1fr);
+      grid-template-columns: 150px repeat(7, 1fr);
       gap:8px;
       flex:1 1 0;
       min-height:0;
@@ -79,8 +82,9 @@
       background:var(--panel-2);
       border-radius:10px;
       padding:14px 12px;
-      font-size:20px;
+      font-size:22px;
       font-weight:700;
+      color:var(--label);
       display:flex;
       align-items:center;
       justify-content:flex-start;
@@ -102,36 +106,39 @@
       padding:0;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:7px;
       min-width:0;
     }
     li{
-      background:rgba(120,169,255,.08);
-      border:1px solid rgba(120,169,255,.18);
+      background:var(--task-bg);
+      border:1px solid var(--task-border);
       border-radius:8px;
-      padding:6px 7px;
-      font-size:13px;
-      line-height:1.25;
+      padding:7px 8px;
+      font-size:16px;
+      font-weight:600;
+      line-height:1.35;
+      color:var(--text);
       min-width:0;
       word-wrap:break-word;
       overflow-wrap:anywhere;
     }
     .time{
-      color:var(--accent);
-      font-weight:700;
+      color:var(--time);
+      font-weight:800;
       margin-right:6px;
       white-space:nowrap;
     }
     .empty{
       color:var(--muted);
       font-style:italic;
-      opacity:.8;
+      opacity:.65;
       padding:6px 2px;
     }
-    @media (max-width: 1200px){
-      .label{font-size:16px}
-      .day .date{font-size:16px}
-      li{font-size:12px}
+    @media (max-width: 1400px){
+      .label{font-size:18px}
+      .day .dow{font-size:13px}
+      .day .date{font-size:18px}
+      li{font-size:14px}
     }
   </style>
 </head>
