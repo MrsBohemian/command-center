@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Center Calendar Module</title>
+  <title>Compact Command Center Calendar Module</title>
   <style>
     :root{
       --bg:#070b10;
@@ -19,27 +19,31 @@
       --task-border:#415467;
     }
     *{box-sizing:border-box}
-    body{
+    html, body{
       margin:0;
+      width:100%;
+      height:100%;
       background:var(--bg);
       color:var(--text);
       font-family: Arial, Helvetica, sans-serif;
+      overflow:hidden;
     }
     .wrap{
       width:100vw;
       height:100vh;
       display:flex;
       flex-direction:column;
-      padding:14px;
-      gap:10px;
+      padding:8px;
+      gap:8px;
       background:var(--bg);
     }
     .header{
       display:grid;
-      grid-template-columns: 150px repeat(7, 1fr);
-      gap:8px;
+      grid-template-columns: 120px repeat(7, 1fr);
+      gap:6px;
       align-items:stretch;
-      min-height:62px;
+      min-height:50px;
+      flex:0 0 auto;
     }
     .corner{
       border:1px solid var(--line);
@@ -50,30 +54,30 @@
       border:1px solid var(--line);
       background:var(--panel-2);
       border-radius:10px;
-      padding:10px 8px;
+      padding:8px 6px;
       display:flex;
       flex-direction:column;
       justify-content:center;
       min-width:0;
     }
     .day .dow{
-      font-size:15px;
+      font-size:13px;
       color:var(--header);
       text-transform:uppercase;
-      letter-spacing:.08em;
-      margin-bottom:4px;
+      letter-spacing:.06em;
+      margin-bottom:2px;
       font-weight:700;
     }
     .day .date{
-      font-size:22px;
+      font-size:18px;
       font-weight:700;
       color:var(--text);
-      line-height:1.1;
+      line-height:1.05;
     }
     .row{
       display:grid;
-      grid-template-columns: 150px repeat(7, 1fr);
-      gap:8px;
+      grid-template-columns: 120px repeat(7, 1fr);
+      gap:6px;
       flex:1 1 0;
       min-height:0;
     }
@@ -81,24 +85,28 @@
       border:1px solid var(--line);
       background:var(--panel-2);
       border-radius:10px;
-      padding:14px 12px;
-      font-size:22px;
+      padding:10px 10px;
+      font-size:18px;
       font-weight:700;
       color:var(--label);
       display:flex;
       align-items:center;
       justify-content:flex-start;
+      min-width:0;
     }
     .box{
       border:1px solid var(--line);
       background:var(--panel);
       border-radius:10px;
-      padding:8px;
+      padding:6px;
       min-width:0;
-      overflow:hidden;
+      min-height:0;
+      overflow-y:auto;
+      overflow-x:hidden;
       display:flex;
       flex-direction:column;
-      gap:6px;
+      gap:5px;
+      scrollbar-width:thin;
     }
     ul{
       list-style:none;
@@ -106,17 +114,17 @@
       padding:0;
       display:flex;
       flex-direction:column;
-      gap:7px;
+      gap:5px;
       min-width:0;
     }
     li{
       background:var(--task-bg);
       border:1px solid var(--task-border);
       border-radius:8px;
-      padding:7px 8px;
-      font-size:16px;
+      padding:5px 6px;
+      font-size:12px;
       font-weight:600;
-      line-height:1.35;
+      line-height:1.22;
       color:var(--text);
       min-width:0;
       word-wrap:break-word;
@@ -125,20 +133,14 @@
     .time{
       color:var(--time);
       font-weight:800;
-      margin-right:6px;
+      margin-right:5px;
       white-space:nowrap;
     }
     .empty{
       color:var(--muted);
-      font-style:italic;
-      opacity:.65;
-      padding:6px 2px;
-    }
-    @media (max-width: 1400px){
-      .label{font-size:18px}
-      .day .dow{font-size:13px}
-      .day .date{font-size:18px}
-      li{font-size:14px}
+      opacity:.45;
+      padding:4px 2px;
+      min-height:18px;
     }
   </style>
 </head>
