@@ -1,94 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Command Center Shell</title>
-  <style>
-    :root{
-      --bg:#070b10;
-      --line:#334355;
-      --panel:#101720;
-      --text:#ffffff;
-    }
-    *{box-sizing:border-box}
-    html, body{
-      margin:0;
-      width:100%;
-      height:100%;
-      background:var(--bg);
-      color:var(--text);
-      font-family: Arial, Helvetica, sans-serif;
-      overflow:hidden;
-    }
-    .shell{
-      width:100vw;
-      height:100vh;
-      display:grid;
-      grid-template-columns: 1fr 2fr;
-      gap:12px;
-      padding:12px;
-      background:var(--bg);
-    }
-    .left{
-      min-width:0;
-      min-height:0;
-      display:grid;
-      grid-template-rows: 1fr 1fr 1fr;
-      gap:12px;
-    }
-    .right{
-      min-width:0;
-      min-height:0;
-    }
-    .frame-wrap{
-      min-width:0;
-      min-height:0;
-      border:1px solid var(--line);
-      border-radius:12px;
-      overflow:hidden;
-      background:var(--panel);
-    }
-    iframe{
-      width:100%;
-      height:100%;
-      border:0;
-      display:block;
-      background:var(--panel);
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Command Center</title>
+
+<style>
+:root{
+  --bg:#0b1220;
+  --panel:#111a2e;
+  --line:#1f2a44;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  background:var(--bg);
+  font-family:system-ui, sans-serif;
+}
+
+/* MAIN LAYOUT */
+.shell{
+  width:100vw;
+  height:100vh;
+  display:grid;
+  grid-template-columns: minmax(360px, 1fr) 2fr;
+  gap:18px;
+  padding:18px;
+  background:var(--bg);
+}
+
+/* LEFT COLUMN */
+.left{
+  display:grid;
+  grid-template-rows: 1fr 1fr 1fr;
+  gap:18px;
+}
+
+/* RIGHT SIDE (calendar) */
+.right{
+  display:block;
+}
+
+/* FRAME WRAPPER (THIS WAS THE PROBLEM) */
+.frame-wrap{
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+  background:var(--panel);
+  padding:6px; /* gives breathing room so content isn't cut */
+}
+
+/* IFRAMES */
+iframe{
+  width:100%;
+  height:100%;
+  border:none;
+  display:block;
+  background:transparent;
+}
+</style>
 </head>
+
 <body>
-  <div class="shell">
-    <div class="left">
-      <div class="frame-wrap">
-        <iframe
-          title="Task Accounting"
-          src="https://mrsbohemian.github.io/command-center/task_accounting_module.html">
-        </iframe>
-      </div>
 
-      <div class="frame-wrap">
-        <iframe
-          title="Customer Tracking"
-          src="https://mrsbohemian.github.io/command-center/customer_tracking_module.html">
-        </iframe>
-      </div>
+<div class="shell">
 
-      <div class="frame-wrap">
-        <iframe
-          title="Business Visual Carousel"
-          src="https://mrsbohemian.github.io/command-center/data_visualization_carousel.html">
-        </iframe>
-      </div>
+  <!-- LEFT COLUMN -->
+  <div class="left">
+
+    <div class="frame-wrap">
+      <iframe src="https://mrsbohemian.github.io/command-center/task_accounting_module.html"></iframe>
     </div>
 
-    <div class="right frame-wrap">
-      <iframe
-        title="Calendar"
-        src="https://mrsbohemian.github.io/command-center/command_center_calendar_module.html">
-      </iframe>
+    <div class="frame-wrap">
+      <iframe src="https://mrsbohemian.github.io/command-center/customer_tracking_module.html"></iframe>
+    </div>
+
+    <div class="frame-wrap">
+      <iframe src="https://mrsbohemian.github.io/command-center/data_visualization_carousel.html"></iframe>
+    </div>
+
+  </div>
+
+  <!-- RIGHT COLUMN -->
+  <div class="right">
+    <div class="frame-wrap" style="height:100%;">
+      <iframe src="https://mrsbohemian.github.io/command-center/command_center_calendar_module.html"></iframe>
     </div>
   </div>
+
+</div>
+
 </body>
 </html>
