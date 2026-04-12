@@ -4,7 +4,6 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Command Center Calendar</title>
-
 <style>
 :root{
   --bg:#070b10;
@@ -18,163 +17,102 @@
   --task-bg:#1e2935;
   --task-border:#415467;
 }
-
 *{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  font-family:Arial, sans-serif;
-}
-
-.wrap{
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  padding:12px;
-  gap:10px;
-}
-
-/* HEADER */
-.header{
-  display:grid;
-  grid-template-columns:140px repeat(7,1fr);
-  gap:8px;
-}
-
-.day{
-  background:var(--panel-2);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:8px;
-}
-
-.dow{
-  font-size:14px;
-  color:var(--header);
-  font-weight:700;
-}
-
-.date{
-  font-size:18px;
-  font-weight:700;
-}
-
-/* ROWS */
-.row{
-  display:grid;
-  grid-template-columns:140px repeat(7,1fr);
-  gap:8px;
-  flex:1;
-}
-
-.label{
-  background:var(--panel-2);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:10px;
-  font-weight:700;
-}
-
-.box{
-  background:var(--panel);
-  border:1px solid var(--line);
-  border-radius:10px;
-  padding:6px;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-
-/* DEFAULT READABLE */
-.box.dense-1 li{
-  font-size:16px;
-  padding:7px 8px;
-}
-
-/* MEDIUM */
-.box.dense-2 li{
-  font-size:14px;
-  padding:6px 7px;
-}
-
-/* HIGH DENSITY */
-.box.dense-3 li{
-  font-size:12px;
-  padding:5px 6px;
-}
-
-ul{
-  list-style:none;
-  margin:0;
-  padding:0;
-  display:flex;
-  flex-direction:column;
-  gap:5px;
-}
-
-li{
-  background:var(--task-bg);
-  border:1px solid var(--task-border);
-  border-radius:8px;
-  font-weight:600;
-}
-
-.time{
-  color:var(--time);
-  font-weight:800;
-  margin-right:5px;
-}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+.wrap{min-height:100vh;display:flex;flex-direction:column;padding:12px;gap:10px}
+.status{font-size:13px;color:var(--muted);padding:0 2px}
+.header{display:grid;grid-template-columns:140px repeat(7,1fr);gap:8px}
+.day{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px}
+.dow{font-size:14px;color:var(--header);font-weight:700}
+.date{font-size:18px;font-weight:700}
+.row{display:grid;grid-template-columns:140px repeat(7,1fr);gap:8px;flex:1}
+.label{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px;font-weight:700;display:flex;align-items:center}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:5px;min-height:120px}
+.box.dense-1 li{font-size:16px;padding:7px 8px}
+.box.dense-2 li{font-size:14px;padding:6px 7px}
+.box.dense-3 li{font-size:12px;padding:5px 6px}
+ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px}
+li{background:var(--task-bg);border:1px solid var(--task-border);border-radius:8px;font-weight:600}
+.time{color:var(--time);font-weight:800;margin-right:5px}
+.empty{opacity:.45}
+.error{color:#ff9b9b}
 </style>
 </head>
-
 <body>
-<div class="wrap" id="app"></div>
+<div class="wrap">
+  <div class="status" id="status">Loading calendar…</div>
+  <div id="app"></div>
+</div>
 
 <script>
+// Replace with your real Railway data service URL.
+const DATA_SERVICE_URL = "https://REPLACE_WITH_YOUR_DATA_SERVICE_URL.up.railway.app";
+const LANES = ["Handley Man", "Heaven", "Daniel"];
+const REFRESH_MS = 30000;
 
-const scheduleData = {
-  "Handley Man": {
-    "2026-04-11": [],
-    "2026-04-12": [],
-    "2026-04-13": [
-      { title: "Start fence job (Wills)" },
-      { title: "Wills visit" }
-    ]
-  },
-  "Heaven": {
-    "2026-04-11": [
-      { title: "Kitchen ✓" },
-      { title: "Bots work" },
-      { title: "Respond to Yvette & Andy" },
-      { title: "Plan menu" },
-      { title: "Groceries" }
-    ],
-    "2026-04-12": [
-      { title: "Bots work" }
-    ]
-  },
-  "Daniel": {}
-};
-
-const startDate = new Date("2026-04-11");
-
-function formatDate(d){
+function formatDateKey(d){
   return d.toISOString().split("T")[0];
 }
 
-function render(){
+function saturdayOfWeek(date){
+  const d = new Date(date);
+  const day = d.getDay(); // 0 Sun ... 6 Sat
+  const diff = day === 6 ? 0 : -(day + 1);
+  d.setDate(d.getDate() + diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
 
+function coerceItem(item){
+  if (typeof item === "string") return { title: item };
+  if (item && typeof item === "object") return { title: item.title || "", time: item.time || "" };
+  return { title: String(item || "") };
+}
+
+function normalizeSchedule(data){
+  const out = {};
+  LANES.forEach(name => { out[name] = {}; });
+
+  if (!data || typeof data !== "object") return out;
+
+  Object.entries(data).forEach(([person, days]) => {
+    if (!out[person]) out[person] = {};
+    if (!days || typeof days !== "object") return;
+
+    Object.entries(days).forEach(([dateKey, items]) => {
+      if (!Array.isArray(items)) {
+        out[person][dateKey] = [];
+        return;
+      }
+      out[person][dateKey] = items.map(coerceItem).filter(x => x.title);
+    });
+  });
+
+  return out;
+}
+
+function pickStartDate(scheduleData){
+  const keys = [];
+  Object.values(scheduleData).forEach(days => {
+    Object.keys(days || {}).forEach(k => keys.push(k));
+  });
+
+  if (!keys.length) return saturdayOfWeek(new Date());
+
+  keys.sort();
+  return saturdayOfWeek(new Date(keys[0] + "T00:00:00"));
+}
+
+function render(scheduleData){
   const app = document.getElementById("app");
   app.innerHTML = "";
 
+  const startDate = pickStartDate(scheduleData);
+  const dates = [];
+
   const header = document.createElement("div");
   header.className = "header";
-
   header.appendChild(document.createElement("div"));
-
-  let dates = [];
 
   for(let i=0;i<7;i++){
     const d = new Date(startDate);
@@ -184,16 +122,14 @@ function render(){
     const el = document.createElement("div");
     el.className = "day";
     el.innerHTML = `
-      <div class="dow">${d.toLocaleDateString(undefined,{weekday:'short'})}</div>
+      <div class="dow">${d.toLocaleDateString(undefined,{weekday:'short'}).toUpperCase()}</div>
       <div class="date">${d.getMonth()+1}/${d.getDate()}</div>
     `;
     header.appendChild(el);
   }
-
   app.appendChild(header);
 
-  Object.entries(scheduleData).forEach(([name, days])=>{
-
+  Object.entries(scheduleData).forEach(([name, days]) => {
     const row = document.createElement("div");
     row.className = "row";
 
@@ -202,26 +138,20 @@ function render(){
     label.textContent = name;
     row.appendChild(label);
 
-    dates.forEach(date=>{
-      const key = formatDate(date);
+    dates.forEach(date => {
+      const key = formatDateKey(date);
       const items = days[key] || [];
-
       const box = document.createElement("div");
       box.className = "box";
 
       const count = items.length;
-
-      if (count >= 5) {
-        box.classList.add("dense-3");
-      } else if (count >= 3) {
-        box.classList.add("dense-2");
-      } else {
-        box.classList.add("dense-1");
-      }
+      if (count >= 5) box.classList.add("dense-3");
+      else if (count >= 3) box.classList.add("dense-2");
+      else box.classList.add("dense-1");
+      if (count === 0) box.classList.add("empty");
 
       const ul = document.createElement("ul");
-
-      items.forEach(item=>{
+      items.forEach(item => {
         const li = document.createElement("li");
         if(item.time){
           li.innerHTML = `<span class="time">${item.time}</span>${item.title}`;
@@ -239,8 +169,26 @@ function render(){
   });
 }
 
-render();
+async function loadCalendar(){
+  const status = document.getElementById("status");
 
+  try {
+    const res = await fetch(`${DATA_SERVICE_URL}/calendar`, { cache: "no-store" });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const raw = await res.json();
+    const scheduleData = normalizeSchedule(raw);
+    render(scheduleData);
+    status.textContent = `Live calendar loaded • ${new Date().toLocaleTimeString()}`;
+    status.classList.remove("error");
+  } catch (err) {
+    status.textContent = `Calendar load failed: ${err.message}`;
+    status.classList.add("error");
+    console.error(err);
+  }
+}
+
+loadCalendar();
+setInterval(loadCalendar, REFRESH_MS);
 </script>
 </body>
 </html>
