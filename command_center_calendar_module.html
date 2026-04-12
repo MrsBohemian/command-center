@@ -173,7 +173,7 @@ async function loadCalendar(){
   const status = document.getElementById("status");
 
   try {
-    const res = await fetch(`${DATA_SERVICE_URL}/calendar`, { cache: "no-store" });
+    const res = await fetch(`${cholobot-data-production.up.railway.app}/calendar`, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const raw = await res.json();
     const scheduleData = normalizeSchedule(raw);
