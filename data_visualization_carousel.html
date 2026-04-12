@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Business Visual Carousel</title>
+  <style>
+    :root{
+      --bg:#070b10;
+      --panel:#171f29;
+      --panel-2:#101720;
+      --line:#334355;
+      --text:#ffffff;
+      --muted:#b9c7d8;
+      --header:#6ee7ff;
+      --accent:#ffd166;
+      --soft:#1e2935;
+      --soft-line:#415467;
+      --good:#7ddc9a;
+      --warn:#ff9f43;
+      --bad:#ff7b7b;
+      --violet:#8b9cff;
+    }
+    *{box-sizing:border-box}
+    html, body{
+      margin:0;
+      width:100%;
+      height:100%;
+      background:var(--bg);
+      color:var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      overflow:hidden;
+    }
+    .wrap{
+      width:100vw;
+      height:100vh;
+      padding:14px;
+      background:var(--bg);
+    }
+    .panel{
+      width:100%;
+      height:100%;
+      border:1px solid var(--line);
+      background:var(--panel);
+      border-radius:12px;
+      padding:14px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex:0 0 auto;
+    }
+    .title h1{
+      margin:0;
+      font-size:28px;
+      line-height:1.1;
+      color:var(--header);
+      font-weight:700;
+    }
+    .subtitle{
+      color:var(--muted);
+      font-size:14px;
+      margin-top:4px;
+    }
+    .counter{
+      color:var(--accent);
+      font-weight:800;
+      font-size:18px;
+      white-space:nowrap;
+      padding-top:4px;
+    }
+    .view{
+      flex:1 1 auto;
+      min-height:0;
+      border:1px solid var(--line);
+      background:var(--panel-2);
+      border-radius:12px;
+      padding:14px;
+      position:relative;
+      overflow:hidden;
+    }
+    .slide{
+      width:100%;
+      height:100%;
+      display:none;
+    }
+    .slide.active{
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .slide-title{
+      font-size:24px;
+      font-weight:800;
+      line-height:1.1;
+      color:var(--text);
+    }
+    .big-number{
+      font-size:64px;
+      font-weight:900;
+      line-height:1;
+      color:var(--accent);
+      letter-spacing:-0.03em;
+    }
+    .label{
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.3;
+    }
+    .bar-shell{
+      width:100%;
+      height:34px;
+      border-radius:999px;
+      background:#0d131b;
+      border:1px solid var(--line);
+      overflow:hidden;
+    }
+    .bar-fill{
+      height:100%;
+      border-radius:999px;
+    }
+    .bar-fill.good{background:var(--good)}
+    .bar-fill.warn{background:var(--warn)}
+    .bar-fill.bad{background:var(--bad)}
+    .bar-fill.violet{background:var(--violet)}
+    .mini-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .card{
+      border:1px solid var(--soft-line);
+      background:var(--soft);
+      border-radius:10px;
+      padding:10px 12px;
+    }
+    .card .k{
+      color:var(--muted);
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      margin-bottom:6px;
+    }
+    .card .v{
+      font-size:26px;
+      font-weight:800;
+      line-height:1.1;
+      color:var(--text);
+    }
+    .debt-wrap{
+      flex:1;
+      min-height:0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      overflow:hidden;
+    }
+    .earth{
+      position:absolute;
+      bottom:-18px;
+      left:50%;
+      transform:translateX(-50%);
+      width:180px;
+      height:180px;
+      border-radius:50%;
+      background:radial-gradient(circle at 40% 35%, #4ecdc4 0%, #2a9d8f 45%, #1d6f6a 70%, #114847 100%);
+      border:2px solid rgba(255,255,255,0.12);
+      box-shadow:0 0 30px rgba(78,205,196,0.12);
+    }
+    .asteroid{
+      position:absolute;
+      top:20px;
+      right:28px;
+      border-radius:50%;
+      background:radial-gradient(circle at 30% 30%, #b0b4bb 0%, #7f8791 28%, #5a616b 60%, #373d44 100%);
+      box-shadow:0 0 30px rgba(255,255,255,0.08);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    .debt-copy{
+      position:absolute;
+      left:14px;
+      top:14px;
+      max-width:56%;
+    }
+    .line-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      overflow:auto;
+    }
+    .line{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+      border:1px solid var(--soft-line);
+      background:var(--soft);
+      border-radius:10px;
+      padding:10px 12px;
+    }
+    .line .name{
+      font-size:18px;
+      font-weight:700;
+      color:var(--text);
+      line-height:1.2;
+    }
+    .line .meta{
+      font-size:13px;
+      color:var(--muted);
+      margin-top:4px;
+    }
+    .line .right{
+      font-size:18px;
+      font-weight:800;
+      color:var(--accent);
+      white-space:nowrap;
+    }
+    .dots{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      flex:0 0 auto;
+    }
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:999px;
+      background:#334355;
+      opacity:.8;
+    }
+    .dot.active{
+      background:var(--accent);
+      opacity:1;
+    }
+    @media (max-width: 1200px){
+      .title h1{font-size:22px}
+      .slide-title{font-size:20px}
+      .big-number{font-size:48px}
+      .card .v{font-size:20px}
+      .line .name{font-size:15px}
+      .line .right{font-size:15px}
+      .label{font-size:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="panel">
+      <div class="top">
+        <div class="title">
+          <h1>Business Visuals</h1>
+          <div class="subtitle">Slow rotation awareness feed</div>
+        </div>
+        <div class="counter" id="counter">1 / 4</div>
+      </div>
+
+      <div class="view">
+        <div class="slide active" id="slide-0">
+          <div class="slide-title">Debt Asteroid</div>
+          <div class="debt-wrap">
+            <div class="debt-copy">
+              <div class="big-number" id="debtPercent">28%</div>
+              <div class="label">Debt destroyed</div>
+              <div class="mini-grid" style="margin-top:14px;">
+                <div class="card">
+                  <div class="k">Starting debt</div>
+                  <div class="v" id="startingDebt">$120k</div>
+                </div>
+                <div class="card">
+                  <div class="k">Current debt</div>
+                  <div class="v" id="currentDebt">$86k</div>
+                </div>
+              </div>
+            </div>
+            <div class="asteroid" id="asteroid"></div>
+            <div class="earth"></div>
+          </div>
+        </div>
+
+        <div class="slide" id="slide-1">
+          <div class="slide-title">Weekly Target</div>
+          <div class="big-number" id="weeklyPercent">73%</div>
+          <div class="label">of weekly target reached</div>
+          <div class="bar-shell">
+            <div class="bar-fill violet" id="weeklyBar" style="width:73%;"></div>
+          </div>
+          <div class="mini-grid">
+            <div class="card">
+              <div class="k">Target</div>
+              <div class="v" id="weeklyTarget">$8,500</div>
+            </div>
+            <div class="card">
+              <div class="k">Actual</div>
+              <div class="v" id="weeklyActual">$6,200</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide" id="slide-2">
+          <div class="slide-title">Time Use Snapshot</div>
+          <div class="bar-shell">
+            <div class="bar-fill good" id="timeWork" style="width:58%; float:left;"></div>
+            <div class="bar-fill violet" id="timeAdmin" style="width:22%; float:left;"></div>
+            <div class="bar-fill warn" id="timeLife" style="width:12%; float:left;"></div>
+            <div class="bar-fill bad" id="timeDrift" style="width:8%; float:left;"></div>
+          </div>
+          <div class="mini-grid">
+            <div class="card">
+              <div class="k">Revenue work</div>
+              <div class="v" id="hoursWork">3.5h</div>
+            </div>
+            <div class="card">
+              <div class="k">Admin</div>
+              <div class="v" id="hoursAdmin">1.5h</div>
+            </div>
+            <div class="card">
+              <div class="k">Life</div>
+              <div class="v" id="hoursLife">1.0h</div>
+            </div>
+            <div class="card">
+              <div class="k">Drift</div>
+              <div class="v" id="hoursDrift">0.5h</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide" id="slide-3">
+          <div class="slide-title">Follow-Up Pressure</div>
+          <div class="line-list" id="followupList"></div>
+        </div>
+      </div>
+
+      <div class="dots" id="dots"></div>
+    </div>
+  </div>
+
+  <script>
+    // Replace this object later with Cholobots / spreadsheet-fed data
+    const data = {
+      debt: {
+        starting: 120000,
+        current: 86000
+      },
+      weekly: {
+        target: 8500,
+        actual: 6200
+      },
+      timeUse: {
+        work: 3.5,
+        admin: 1.5,
+        life: 1.0,
+        drift: 0.5
+      },
+      followups: [
+        { name: "Lopez", status: "invoice", time: "today" },
+        { name: "Robinson", status: "estimate", time: "2d" },
+        { name: "Garcia", status: "follow-up", time: "5d" },
+        { name: "Yvette", status: "response needed", time: "6d" }
+      ]
+    };
+
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const dotsWrap = document.getElementById("dots");
+    let currentIndex = 0;
+    const rotationMs = 50000;
+
+    function money(n){
+      return new Intl.NumberFormat(undefined, {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0
+      }).format(n);
+    }
+
+    function renderDebt(){
+      const pctDestroyed = Math.max(0, Math.min(100, Math.round((1 - (data.debt.current / data.debt.starting)) * 100)));
+      document.getElementById("debtPercent").textContent = pctDestroyed + "%";
+      document.getElementById("startingDebt").textContent = money(data.debt.starting);
+      document.getElementById("currentDebt").textContent = money(data.debt.current);
+
+      const ratioLeft = Math.max(0.15, data.debt.current / data.debt.starting);
+      const asteroid = document.getElementById("asteroid");
+      const size = Math.round(140 * ratioLeft);
+      asteroid.style.width = size + "px";
+      asteroid.style.height = size + "px";
+    }
+
+    function renderWeekly(){
+      const pct = Math.max(0, Math.min(100, Math.round((data.weekly.actual / data.weekly.target) * 100)));
+      document.getElementById("weeklyPercent").textContent = pct + "%";
+      document.getElementById("weeklyTarget").textContent = money(data.weekly.target);
+      document.getElementById("weeklyActual").textContent = money(data.weekly.actual);
+      document.getElementById("weeklyBar").style.width = pct + "%";
+    }
+
+    function renderTimeUse(){
+      const total = Object.values(data.timeUse).reduce((a,b) => a+b, 0) || 1;
+      const workPct = (data.timeUse.work / total) * 100;
+      const adminPct = (data.timeUse.admin / total) * 100;
+      const lifePct = (data.timeUse.life / total) * 100;
+      const driftPct = (data.timeUse.drift / total) * 100;
+
+      document.getElementById("timeWork").style.width = workPct + "%";
+      document.getElementById("timeAdmin").style.width = adminPct + "%";
+      document.getElementById("timeLife").style.width = lifePct + "%";
+      document.getElementById("timeDrift").style.width = driftPct + "%";
+
+      document.getElementById("hoursWork").textContent = data.timeUse.work.toFixed(1) + "h";
+      document.getElementById("hoursAdmin").textContent = data.timeUse.admin.toFixed(1) + "h";
+      document.getElementById("hoursLife").textContent = data.timeUse.life.toFixed(1) + "h";
+      document.getElementById("hoursDrift").textContent = data.timeUse.drift.toFixed(1) + "h";
+    }
+
+    function renderFollowups(){
+      const list = document.getElementById("followupList");
+      list.innerHTML = "";
+      data.followups.forEach(item => {
+        const row = document.createElement("div");
+        row.className = "line";
+        row.innerHTML = `
+          <div>
+            <div class="name">${item.name}</div>
+            <div class="meta">${item.status}</div>
+          </div>
+          <div class="right">${item.time}</div>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function buildDots(){
+      dotsWrap.innerHTML = "";
+      slides.forEach((_, i) => {
+        const dot = document.createElement("div");
+        dot.className = "dot" + (i === 0 ? " active" : "");
+        dotsWrap.appendChild(dot);
+      });
+    }
+
+    function showSlide(index){
+      slides.forEach((slide, i) => {
+        slide.classList.toggle("active", i === index);
+      });
+
+      const dots = Array.from(document.querySelectorAll(".dot"));
+      dots.forEach((dot, i) => {
+        dot.classList.toggle("active", i === index);
+      });
+
+      document.getElementById("counter").textContent = (index + 1) + " / " + slides.length;
+    }
+
+    function startRotation(){
+      setInterval(() => {
+        currentIndex = (currentIndex + 1) % slides.length;
+        showSlide(currentIndex);
+      }, rotationMs);
+    }
+
+    renderDebt();
+    renderWeekly();
+    renderTimeUse();
+    renderFollowups();
+    buildDots();
+    showSlide(0);
+    startRotation();
+  </script>
+</body>
+</html>
