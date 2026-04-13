@@ -47,10 +47,14 @@ li{background:var(--task-bg);border:1px solid var(--task-border);border-radius:8
 </div>
 
 <script>
-// Replace with your real Railway data service URL.
 const DATA_SERVICE_URL = "https://cholobot-data-production.up.railway.app";
-const LANES = ["Handley Man", "Heaven", "Daniel"];
 const REFRESH_MS = 30000;
+
+const LANE_CONFIG = [
+  { key: "handley_man", label: "Handley Man" },
+  { key: "heaven", label: "Heaven" },
+  { key: "daniel", label: "Daniel" }
+];
 
 function formatDateKey(d){
   return d.toISOString().split("T")[0];
@@ -64,33 +68,45 @@ function startOfToday(date = new Date()){
 
 function coerceItem(item){
   if (typeof item === "string") return { title: item };
-  if (item && typeof item === "object") return { title: item.title || "", time: item.time || "" };
+  if (item && typeof item === "object") {
+    return {
+      title: item.title || "",
+      time: item.time || ""
+    };
+  }
   return { title: String(item || "") };
 }
 
 function normalizeSchedule(data){
   const out = {};
-  LANES.forEach(name => { out[name] = {}; });
+
+  LANE_CONFIG.forEach(lane => {
+    out[lane.key] = {};
+  });
 
   if (!data || typeof data !== "object") return out;
 
-  Object.entries(data).forEach(([person, days]) => {
-    if (!out[person]) out[person] = {};
+  LANE_CONFIG.forEach(lane => {
+    const days = data[lane.key];
+
     if (!days || typeof days !== "object") return;
 
     Object.entries(days).forEach(([dateKey, items]) => {
       if (!Array.isArray(items)) {
-        out[person][dateKey] = [];
+        out[lane.key][dateKey] = [];
         return;
       }
-      out[person][dateKey] = items.map(coerceItem).filter(x => x.title);
+
+      out[lane.key][dateKey] = items
+        .map(coerceItem)
+        .filter(x => x.title);
     });
   });
 
   return out;
 }
 
-function pickStartDate(scheduleData){
+function pickStartDate(){
   return startOfToday();
 }
 
@@ -98,40 +114,44 @@ function render(scheduleData){
   const app = document.getElementById("app");
   app.innerHTML = "";
 
-  const startDate = pickStartDate(scheduleData);
+  const startDate = pickStartDate();
   const dates = [];
 
   const header = document.createElement("div");
   header.className = "header";
   header.appendChild(document.createElement("div"));
 
-  for(let i=0;i<7;i++){
+  for(let i = 0; i < 7; i++){
     const d = new Date(startDate);
-    d.setDate(d.getDate()+i);
+    d.setDate(d.getDate() + i);
     dates.push(d);
 
     const el = document.createElement("div");
     el.className = "day";
     el.innerHTML = `
-      <div class="dow">${d.toLocaleDateString(undefined,{weekday:'short'}).toUpperCase()}</div>
-      <div class="date">${d.getMonth()+1}/${d.getDate()}</div>
+      <div class="dow">${d.toLocaleDateString(undefined, { weekday: "short" }).toUpperCase()}</div>
+      <div class="date">${d.getMonth() + 1}/${d.getDate()}</div>
     `;
     header.appendChild(el);
   }
+
   app.appendChild(header);
 
-  Object.entries(scheduleData).forEach(([name, days]) => {
+  LANE_CONFIG.forEach(lane => {
+    const days = scheduleData[lane.key] || {};
+
     const row = document.createElement("div");
     row.className = "row";
 
     const label = document.createElement("div");
     label.className = "label";
-    label.textContent = name;
+    label.textContent = lane.label;
     row.appendChild(label);
 
     dates.forEach(date => {
       const key = formatDateKey(date);
       const items = days[key] || [];
+
       const box = document.createElement("div");
       box.className = "box";
 
@@ -142,9 +162,10 @@ function render(scheduleData){
       if (count === 0) box.classList.add("empty");
 
       const ul = document.createElement("ul");
+
       items.forEach(item => {
         const li = document.createElement("li");
-        if(item.time){
+        if (item.time) {
           li.innerHTML = `<span class="time">${item.time}</span>${item.title}`;
         } else {
           li.textContent = item.title;
@@ -166,9 +187,12 @@ async function loadCalendar(){
   try {
     const res = await fetch(`${DATA_SERVICE_URL}/calendar`, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     const raw = await res.json();
     const scheduleData = normalizeSchedule(raw);
+
     render(scheduleData);
+
     status.textContent = `Live calendar loaded • ${new Date().toLocaleTimeString()}`;
     status.classList.remove("error");
   } catch (err) {
