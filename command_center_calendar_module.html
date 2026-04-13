@@ -54,11 +54,8 @@ function formatDateKey(d){
   return d.toISOString().split("T")[0];
 }
 
-function saturdayOfWeek(date){
+function startOfToday(date = new Date()){
   const d = new Date(date);
-  const day = d.getDay(); // 0 Sun ... 6 Sat
-  const diff = day === 6 ? 0 : -(day + 1);
-  d.setDate(d.getDate() + diff);
   d.setHours(0,0,0,0);
   return d;
 }
@@ -92,15 +89,7 @@ function normalizeSchedule(data){
 }
 
 function pickStartDate(scheduleData){
-  const keys = [];
-  Object.values(scheduleData).forEach(days => {
-    Object.keys(days || {}).forEach(k => keys.push(k));
-  });
-
-  if (!keys.length) return saturdayOfWeek(new Date());
-
-  keys.sort();
-  return saturdayOfWeek(new Date(keys[0] + "T00:00:00"));
+  return startOfToday();
 }
 
 function render(scheduleData){
