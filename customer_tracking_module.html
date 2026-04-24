@@ -2,23 +2,111 @@
 <html>
 <head>
 <style>
-body{margin:0;background:#0b1220;color:#e6ecff;font-family:sans-serif;}
-.panel{padding:10px;display:flex;flex-direction:column;gap:10px;height:100vh;overflow:hidden;}
-.title{display:flex;justify-content:space-between;font-size:22px;}
-.list{display:flex;flex-direction:column;gap:6px;overflow:hidden;}
-.item{padding:8px;background:#1f2a44;border-radius:6px;font-size:14px;}
+body{
+  margin:0;
+  background:#0b1220;
+  color:#e6ecff;
+  font-family:sans-serif;
+}
+
+.panel{
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  height:100vh;
+  overflow:hidden;
+}
+
+.title{
+  display:flex;
+  justify-content:space-between;
+  font-size:22px;
+}
+
+.list{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  overflow:auto;
+}
+
+.item{
+  padding:8px;
+  background:#1f2a44;
+  border-radius:6px;
+  font-size:13px;
+  line-height:1.25;
+}
+
+.status{
+  opacity:.75;
+  font-size:12px;
+}
 </style>
 </head>
+
 <body>
 <div class="panel">
-  <div class="title"><div>Customer Follow-Up</div><div>5</div></div>
-  <div class="list">
-    <div class="item">Wills – Estimate pending</div>
-    <div class="item">Andy – Awaiting response</div>
-    <div class="item">Yvette – Follow-up needed</div>
-    <div class="item">Fence job – Scheduled</div>
-    <div class="item">New lead – Call back</div>
+  <div class="title">
+    <div>Customer Follow-Up</div>
+    <div id="count">0</div>
+  </div>
+
+  <div class="list" id="list">
+    <div class="item">Loading chisme...</div>
   </div>
 </div>
+
+<script>
+const DATA_URL = "https://cholobot-data-production.up.railway.app/chisme_followups.json";
+
+function shortCard(item){
+  const text = item.contact_card || item.raw_note || "No details";
+  return text
+    .replace(/\n+/g, " · ")
+    .slice(0, 220);
+}
+
+async function loadChisme(){
+  const list = document.getElementById("list");
+  const count = document.getElementById("count");
+
+  try{
+    const res = await fetch(DATA_URL);
+    const items = await res.json();
+
+    count.textContent = items.length;
+    list.innerHTML = "";
+
+    if(!items.length){
+      list.innerHTML = `<div class="item">No customer follow-ups yet.</div>`;
+      return;
+    }
+
+    items
+      .filter(item => item.status !== "done")
+      .slice(-8)
+      .reverse()
+      .forEach(item => {
+        const div = document.createElement("div");
+        div.className = "item";
+        div.innerHTML = `
+          <div>${shortCard(item)}</div>
+          <div class="status">${item.status || "needs_followup"}</div>
+        `;
+        list.appendChild(div);
+      });
+
+  } catch(err){
+    list.innerHTML = `<div class="item">Could not load Chismebot follow-ups yet.</div>`;
+    count.textContent = "!";
+    console.error(err);
+  }
+}
+
+loadChisme();
+setInterval(loadChisme, 60000);
+</script>
 </body>
 </html>
