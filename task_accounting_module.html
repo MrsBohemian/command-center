@@ -5,20 +5,93 @@
 body{margin:0;background:#0b1220;color:#e6ecff;font-family:sans-serif;}
 .panel{display:flex;flex-direction:column;padding:10px;gap:10px;height:100vh;overflow:hidden;}
 .title{display:flex;justify-content:space-between;font-size:22px;}
-.bar{height:44px;background:#1f2a44;border-radius:8px;}
-.legend{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:14px;}
+.bar-wrap{height:44px;background:#1f2a44;border-radius:8px;overflow:hidden;display:flex;}
+.bar-segment{height:100%;}
+.legend{display:grid;grid-template-columns:1fr auto;gap:6px;font-size:14px;overflow:auto;}
+.muted{opacity:.7;font-size:12px;}
 </style>
 </head>
 <body>
 <div class="panel">
-  <div class="title"><div>Task Accounting</div><div>$2,100</div></div>
-  <div class="bar"></div>
-  <div class="legend">
-    <div>Estimating</div><div>3h</div>
-    <div>Job Work</div><div>5h</div>
-    <div>Admin</div><div>2h</div>
-    <div>Sales</div><div>1h</div>
+  <div class="title">
+    <div>Task Accounting</div>
+    <div id="total">0h</div>
+  </div>
+
+  <div class="bar-wrap" id="bar"></div>
+
+  <div class="legend" id="legend">
+    <div class="muted">Loading task data...</div>
   </div>
 </div>
+
+<script>
+const DATA_URL = "https://cholobot-data-production.up.railway.app/tasks";
+
+const COLORS = [
+  "#8ab4f8",
+  "#81c995",
+  "#fdd663",
+  "#f28b82",
+  "#c58af9",
+  "#78d9ec"
+];
+
+function isNumber(value){
+  return typeof value === "number" && !Number.isNaN(value);
+}
+
+async function loadTasks(){
+  const totalEl = document.getElementById("total");
+  const barEl = document.getElementById("bar");
+  const legendEl = document.getElementById("legend");
+
+  try{
+    const res = await fetch(DATA_URL);
+    const data = await res.json();
+
+    const entries = Object.entries(data)
+      .filter(([key, value]) => key !== "entries" && isNumber(value));
+
+    const total = entries.reduce((sum, [_, value]) => sum + value, 0);
+
+    totalEl.textContent = `${total}h`;
+    barEl.innerHTML = "";
+    legendEl.innerHTML = "";
+
+    if(!entries.length || total === 0){
+      legendEl.innerHTML = `<div class="muted">No task accounting yet.</div>`;
+      return;
+    }
+
+    entries.forEach(([category, hours], index) => {
+      const pct = total ? (hours / total) * 100 : 0;
+
+      const segment = document.createElement("div");
+      segment.className = "bar-segment";
+      segment.style.width = `${pct}%`;
+      segment.style.background = COLORS[index % COLORS.length];
+      barEl.appendChild(segment);
+
+      const label = document.createElement("div");
+      label.textContent = category;
+
+      const value = document.createElement("div");
+      value.textContent = `${hours}h`;
+
+      legendEl.appendChild(label);
+      legendEl.appendChild(value);
+    });
+
+  } catch(err){
+    console.error(err);
+    totalEl.textContent = "!";
+    legendEl.innerHTML = `<div class="muted">Could not load task data.</div>`;
+  }
+}
+
+loadTasks();
+setInterval(loadTasks, 60000);
+</script>
 </body>
 </html>
