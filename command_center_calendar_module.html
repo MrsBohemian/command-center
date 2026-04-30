@@ -30,9 +30,12 @@ body{background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
 .row{display:grid;grid-template-columns:140px repeat(7,1fr);gap:8px;flex:1;min-height:0}
 .label{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px;font-weight:700;display:flex;align-items:center;min-height:0}
 .box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:6px;display:flex;flex-direction:column;gap:5px;min-height:0;overflow:hidden}
-.box.dense-1 li{font-size:16px;padding:7px 8px}
-.box.dense-2 li{font-size:14px;padding:6px 7px}
-.box.dense-3 li{font-size:12px;padding:5px 6px}
+.box.dense-1 li{font-size:15px;padding:6px 7px}
+.box.dense-2 li{font-size:13px;padding:5px 6px}
+.box.dense-3 li{font-size:11px;padding:4px 5px}
+.box.dense-4 li{font-size:10px;padding:3px 4px}
+.box.dense-5 li{font-size:8px;padding:2px 3px;line-height:1.05}
+
   
 li{
   background:var(--task-bg);
@@ -175,9 +178,23 @@ function render(scheduleData){
       box.className = "box";
 
       const count = items.length;
-      if (count >= 5) box.classList.add("dense-3");
-      else if (count >= 3) box.classList.add("dense-2");
+
+      const longest = items.reduce((m, item) => {
+        const text = `${item.time ? item.time + " " : ""}${item.title || ""}`;
+        return Math.max(m, text.length);
+      }, 0);
+      
+      const totalChars = items.reduce((sum, item) => {
+        const text = `${item.time ? item.time + " " : ""}${item.title || ""}`;
+        return sum + text.length;
+      }, 0);
+      
+      if (count >= 6 || totalChars > 90 || longest > 45) box.classList.add("dense-5");
+      else if (count >= 5 || totalChars > 70 || longest > 35) box.classList.add("dense-4");
+      else if (count >= 4 || totalChars > 50 || longest > 28) box.classList.add("dense-3");
+      else if (count >= 3 || totalChars > 35 || longest > 20) box.classList.add("dense-2");
       else box.classList.add("dense-1");
+      
       if (count === 0) box.classList.add("empty");
 
       const ul = document.createElement("ul");
