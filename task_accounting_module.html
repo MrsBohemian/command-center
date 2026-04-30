@@ -2,91 +2,144 @@
 <html>
 <head>
 <style>
-body{margin:0;background:#0b1220;color:#e6ecff;font-family:sans-serif;}
-.panel{display:flex;flex-direction:column;padding:10px;gap:10px;height:100vh;overflow:hidden;}
-.title{display:flex;justify-content:space-between;font-size:22px;}
-.bar-wrap{height:44px;background:#1f2a44;border-radius:8px;overflow:hidden;display:flex;}
-.bar-segment{height:100%;}
-.legend{display:grid;grid-template-columns:1fr auto;gap:6px;font-size:14px;overflow:auto;}
-.muted{opacity:.7;font-size:12px;}
+body{
+  margin:0;
+  background:#0b1220;
+  color:#e6ecff;
+  font-family:sans-serif;
+}
+
+.panel{
+  display:flex;
+  flex-direction:column;
+  padding:10px;
+  gap:10px;
+  height:100vh;
+  overflow:hidden;
+}
+
+.title{
+  display:flex;
+  justify-content:space-between;
+  font-size:22px;
+}
+
+.summary{
+  background:#1f2a44;
+  border-radius:8px;
+  padding:8px;
+  font-size:14px;
+  line-height:1.35;
+}
+
+.blocks{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  overflow:auto;
+  font-size:13px;
+}
+
+.block{
+  background:#111a2e;
+  border:1px solid #1f2a44;
+  border-radius:6px;
+  padding:7px;
+}
+
+.activity{
+  font-weight:700;
+}
+
+.meta{
+  opacity:.75;
+  font-size:12px;
+  margin-top:3px;
+}
 </style>
 </head>
+
 <body>
 <div class="panel">
   <div class="title">
     <div>Task Accounting</div>
-    <div id="total">0h</div>
+    <div id="total">0m</div>
   </div>
 
-  <div class="bar-wrap" id="bar"></div>
-
-  <div class="legend" id="legend">
-    <div class="muted">Loading task data...</div>
+  <div class="summary" id="summary">
+    Loading time data...
   </div>
+
+  <div class="blocks" id="blocks"></div>
 </div>
 
 <script>
 const DATA_URL = "https://cholobot-data-production.up.railway.app/tasks";
 
-const COLORS = [
-  "#8ab4f8",
-  "#81c995",
-  "#fdd663",
-  "#f28b82",
-  "#c58af9",
-  "#78d9ec"
-];
-
-function isNumber(value){
-  return typeof value === "number" && !Number.isNaN(value);
+function formatTime(iso){
+  if(!iso) return "";
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
 }
 
 async function loadTasks(){
   const totalEl = document.getElementById("total");
-  const barEl = document.getElementById("bar");
-  const legendEl = document.getElementById("legend");
+  const summaryEl = document.getElementById("summary");
+  const blocksEl = document.getElementById("blocks");
 
   try{
     const res = await fetch(DATA_URL);
     const data = await res.json();
 
-    const entries = Object.entries(data)
-      .filter(([key, value]) => key !== "entries" && isNumber(value));
+    const blocks = data.blocks || [];
+    const totalLabel = data.total_label || "0m";
+    const blocksLogged = data.blocks_logged || blocks.length || 0;
+    const lastBlock = blocks.length ? blocks[blocks.length - 1] : null;
 
-    const total = entries.reduce((sum, [_, value]) => sum + value, 0);
+    totalEl.textContent = totalLabel;
 
-    totalEl.textContent = `${total}h`;
-    barEl.innerHTML = "";
-    legendEl.innerHTML = "";
-
-    if(!entries.length || total === 0){
-      legendEl.innerHTML = `<div class="muted">No task accounting yet.</div>`;
+    if(!blocks.length){
+      summaryEl.innerHTML = `
+        <div><strong>Time accounted today:</strong> ${totalLabel}</div>
+        <div><strong>Blocks logged:</strong> 0</div>
+        <div><strong>Last activity:</strong> No time blocks yet.</div>
+      `;
+      blocksEl.innerHTML = "";
       return;
     }
 
-    entries.forEach(([category, hours], index) => {
-      const pct = total ? (hours / total) * 100 : 0;
+    summaryEl.innerHTML = `
+      <div><strong>Time accounted today:</strong> ${totalLabel}</div>
+      <div><strong>Blocks logged:</strong> ${blocksLogged}</div>
+      <div><strong>Last activity:</strong> ${lastBlock.activity || "—"} (${lastBlock.duration_label || ""})</div>
+    `;
 
-      const segment = document.createElement("div");
-      segment.className = "bar-segment";
-      segment.style.width = `${pct}%`;
-      segment.style.background = COLORS[index % COLORS.length];
-      barEl.appendChild(segment);
+    blocksEl.innerHTML = "";
 
-      const label = document.createElement("div");
-      label.textContent = category;
+    blocks
+      .slice()
+      .reverse()
+      .slice(0, 8)
+      .forEach(block => {
+        const div = document.createElement("div");
+        div.className = "block";
 
-      const value = document.createElement("div");
-      value.textContent = `${hours}h`;
+        div.innerHTML = `
+          <div class="activity">${block.activity || "Unnamed activity"}</div>
+          <div class="meta">
+            ${formatTime(block.start)}–${formatTime(block.end)}
+            · ${block.duration_label || block.duration_minutes + "m"}
+          </div>
+        `;
 
-      legendEl.appendChild(label);
-      legendEl.appendChild(value);
-    });
+        blocksEl.appendChild(div);
+      });
 
   } catch(err){
     console.error(err);
     totalEl.textContent = "!";
-    legendEl.innerHTML = `<div class="muted">Could not load task data.</div>`;
+    summaryEl.innerHTML = "Could not load task accounting data.";
+    blocksEl.innerHTML = "";
   }
 }
 
