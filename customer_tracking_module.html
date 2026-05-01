@@ -62,7 +62,12 @@ body{
 const DATA_URL = "https://cholobot-data-production.up.railway.app/chisme_followups.json";
 
 function shortCard(item){
-  const text = item.contact_card || item.raw_note || "No details";
+  const text =
+    item.contact_card ||
+    (item.name ? `${item.name} — ${item.reason || "follow up"}` : "") ||
+    item.raw_note ||
+    "No details";
+
   return text
     .replace(/\n+/g, " · ")
     .slice(0, 220);
