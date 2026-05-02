@@ -1,27 +1,99 @@
-<!DOCTYPE html>
-<html>
-<head>
-<style>
-body{margin:0;background:#0b1220;color:#e6ecff;font-family:sans-serif;}
-.panel{padding:10px;height:100vh;display:flex;flex-direction:column;gap:10px;overflow:hidden;}
-.title{font-size:22px;}
-.view{flex:1;display:flex;align-items:center;justify-content:center;font-size:40px;background:#1f2a44;border-radius:10px;}
-</style>
-</head>
-<body>
-<div class="panel">
-  <div class="title">Data Visualization</div>
-  <div class="view" id="view">Revenue</div>
-</div>
-
 <script>
-const slides = ["Revenue $5k", "Materials $1.2k", "Debt ↓", "Profit ↑"];
-let i=0;
-setInterval(()=>{
-  document.getElementById("view").innerText = slides[i%slides.length];
-  i++;
-},4000);
-</script>
+const BASE = "https://cholobot-data-production.up.railway.app";
 
-</body>
-</html>
+const ENDPOINTS = [
+  { name: "weekly", url: BASE + "/weekly_target" },
+  { name: "debt", url: BASE + "/debt_snowball" },
+  { name: "job", url: BASE + "/job_costing" },
+  { name: "estimate", url: BASE + "/estimate_actuals" },
+  { name: "materials", url: BASE + "/materials_reality" },
+  { name: "patterns", url: BASE + "/business_patterns" }
+];
+
+let cache = {};
+let index = 0;
+
+async function fetchData() {
+  for (let ep of ENDPOINTS) {
+    try {
+      const res = await fetch(ep.url);
+      cache[ep.name] = await res.json();
+    } catch {
+      cache[ep.name] = null;
+    }
+  }
+}
+
+function render(name) {
+  const el = document.getElementById("view");
+  const data = cache[name];
+
+  if (!data) {
+    el.innerText = "No data";
+    return;
+  }
+
+  // --- WEEKLY TARGET ---
+  if (name === "weekly") {
+    el.innerText =
+      `$${data.collected || 0} / $${data.weekly_target || 0}\n` +
+      `Remaining: $${data.remaining || 0}`;
+  }
+
+  // --- DEBT ---
+  else if (name === "debt") {
+    el.innerText =
+      `Debt: $${data.debt_total || 0}\n` +
+      `Next: $${data.next_payment_target || 0}`;
+  }
+
+  // --- JOB COSTING ---
+  else if (name === "job") {
+    const job = data.recent_jobs?.[0];
+    if (!job) {
+      el.innerText = "No jobs yet";
+      return;
+    }
+
+    el.innerText =
+      `${job.job_name}\n` +
+      `Profit: $${job.profit}`;
+  }
+
+  // --- ESTIMATE ---
+  else if (name === "estimate") {
+    const e = data.estimate_actuals?.[0];
+    if (!e) {
+      el.innerText = "No estimate data";
+      return;
+    }
+
+    el.innerText =
+      `${e.job_type}\n` +
+      `$${e.avg_charged_per_unit}/${e.unit}`;
+  }
+
+  // --- MATERIALS ---
+  else if (name === "materials") {
+    el.innerText =
+      `Used: ${data.recent_items?.length || 0} items`;
+  }
+
+  // --- PATTERNS ---
+  else if (name === "patterns") {
+    const p = data.top_patterns?.[0];
+    el.innerText =
+      p ? p : "No patterns yet";
+  }
+}
+
+async function loop() {
+  await fetchData();
+  const name = ENDPOINTS[index % ENDPOINTS.length].name;
+  render(name);
+  index++;
+}
+
+loop();
+setInterval(loop, 5000);
+</script>
