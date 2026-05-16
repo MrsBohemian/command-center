@@ -130,19 +130,7 @@ function normalizeSchedule(data){
 }
 
 function pickStartDate(){
-  const today = startOfToday();
-  const day = today.getDay(); // 0=Sun
-
-  const mondayOffset = day === 0 ? -6 : 1 - day;
-
-  today.setDate(today.getDate() + mondayOffset);
-
-  // Fri/Sat/Sun → shift to next operational week
-  if (day === 5 || day === 6 || day === 0) {
-    today.setDate(today.getDate() + 7);
-  }
-
-  return today;
+  return startOfToday();
 }
 
 function render(scheduleData){
