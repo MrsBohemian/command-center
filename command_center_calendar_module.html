@@ -92,8 +92,9 @@ function coerceItem(item){
   if (typeof item === "string") return { title: item };
   if (item && typeof item === "object") {
     return {
-      title: item.title || "",
-      time: item.time || ""
+      title: item.title || item.text || "",
+      time: item.time || "",
+      done: item.done || false
     };
   }
   return { title: String(item || "") };
