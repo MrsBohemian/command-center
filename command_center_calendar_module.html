@@ -137,6 +137,11 @@ function pickStartDate(){
 
   today.setDate(today.getDate() + mondayOffset);
 
+  // Fri/Sat/Sun → shift to next operational week
+  if (day === 5 || day === 6 || day === 0) {
+    today.setDate(today.getDate() + 7);
+  }
+
   return today;
 }
 
