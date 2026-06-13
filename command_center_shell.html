@@ -341,24 +341,38 @@
       .brand-subtitle-row { flex-wrap: wrap; }
       .skull-accent { width: 34px; height: 34px; }
     }
+    .bike-art,
+.chicken-art {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.bike-art img,
+.chicken-art img {
+    height: 120px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+}
   </style>
 </head>
 <body>
   <main class="app">
     <header class="header panel">
-      <div class="art-slot bicycle-slot">
-        <img src="assets/bicycle-left.png" alt="Bicycle" />
+      <div class="bike-art">
+          <img src="assets/bicycle-left.png" alt="Bicycle" />
       </div>
       <div class="brand-center">
-        <h1 class="brand-title">Handley Man<br />Command Center</h1>
+        <h1 class="brand-title">Handley Man Command Center</h1>
         <div class="brand-subtitle-row">
           <span class="brand-subtitle">Home Repair • Electrical</span>
           <img class="skull-accent" src="assets/sugarskull.png" alt="Sugar skull" />
           <span class="brand-subtitle">Circular Construction • New Urbanism</span>
         </div>
       </div>
-      <div class="art-slot chicken-slot">
-        <img src="assets/chicken-right.png" alt="Chicken" />
+      <div class="chicken-art">
+          <img src="assets/chicken-right.png" alt="Chicken" />
       </div>
     </header>
 
