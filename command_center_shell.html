@@ -1,101 +1,502 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<meta http-equiv="refresh" content="60" />
-<title>Command Center</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Handley Man Command Center</title>
+  <style>
+    :root {
+      --bg: #080914;
+      --panel: rgba(17, 24, 42, 0.92);
+      --panel2: rgba(22, 31, 54, 0.88);
+      --ink: #fff7dc;
+      --muted: #bfc2d6;
+      --line: rgba(255,255,255,.14);
+      --pink: #ff4fb8;
+      --cyan: #35d9ff;
+      --yellow: #ffd75e;
+      --orange: #ff8c42;
+      --green: #66f29a;
+      --purple: #9f7aff;
+      --red: #ff5c7a;
+      --radius: 22px;
+      --shadow: 0 18px 50px rgba(0,0,0,.42);
+    }
 
-<style>
-:root{
-  --bg:#0b1220;
-  --panel:#111a2e;
-  --line:#1f2a44;
-}
+    * { box-sizing: border-box; }
 
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 5%, rgba(255,79,184,.22), transparent 30%),
+        radial-gradient(circle at 86% 8%, rgba(53,217,255,.18), transparent 28%),
+        radial-gradient(circle at 80% 92%, rgba(255,215,94,.13), transparent 28%),
+        linear-gradient(135deg, #070711 0%, #10162d 46%, #090d1d 100%);
+      padding: 18px;
+      overflow-x: hidden;
+    }
 
-body{
-  background:var(--bg);
-  font-family:system-ui, sans-serif;
-}
+    .app {
+      max-width: 1740px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+    }
 
-/* MAIN LAYOUT */
-.shell{
-  width:100vw;
-  height:100vh;
-  display:grid;
-  grid-template-columns: minmax(360px, 1fr) 2fr;
-  gap:18px;
-  padding:18px;
-  background:var(--bg);
-}
+    .panel {
+      background: linear-gradient(145deg, var(--panel), var(--panel2));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+    }
 
-/* LEFT COLUMN */
-.left{
-  display:grid;
-  grid-template-rows: 1fr 1fr 1fr;
-  gap:18px;
-}
+    .panel:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(255,255,255,.08), transparent 32%);
+      pointer-events: none;
+    }
 
-/* RIGHT SIDE (calendar) */
-.right{
-  display:block;
-}
+    .header {
+      min-height: 128px;
+      display: grid;
+      grid-template-columns: 180px 1fr 180px;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 24px;
+    }
 
-/* FRAME WRAPPER */
-.frame-wrap{
-  border:1px solid var(--line);
-  border-radius:14px;
-  overflow:hidden;
-  background:var(--panel);
-  padding:6px;
-}
+    .brand-center { text-align: center; z-index: 1; }
 
-/* IFRAMES */
-iframe{
-  width:100%;
-  height:100%;
-  border:none;
-  display:block;
-  background:transparent;
-}
-</style>
+    .brand-title {
+      margin: 0;
+      font-size: clamp(2rem, 4.2vw, 4.7rem);
+      line-height: .92;
+      letter-spacing: .02em;
+      font-weight: 950;
+      text-transform: uppercase;
+      text-shadow: 0 0 18px rgba(53,217,255,.25), 0 0 12px rgba(255,79,184,.20);
+    }
+
+    .brand-subtitle {
+      margin-top: 10px;
+      color: var(--yellow);
+      font-weight: 850;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-size: clamp(.74rem, 1.05vw, 1rem);
+    }
+
+    .art-slot {
+      z-index: 1;
+      min-height: 86px;
+      border: 1px dashed rgba(255,255,255,.24);
+      border-radius: 20px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.04);
+      color: rgba(255,247,220,.82);
+      font-size: .82rem;
+      font-weight: 800;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .art-slot img { max-width: 100%; max-height: 110px; object-fit: contain; }
+    .bicycle-slot { border-color: rgba(53,217,255,.35); }
+    .chicken-slot { border-color: rgba(255,140,66,.38); }
+
+    .main-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, .82fr) minmax(600px, 1.45fr) minmax(330px, .9fr);
+      gap: 16px;
+      min-height: 670px;
+    }
+
+    .stack { display: grid; gap: 16px; }
+
+    .card { padding: 18px; }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      z-index: 1;
+      position: relative;
+    }
+
+    .source-tag {
+      color: var(--muted);
+      font-size: .68rem;
+      letter-spacing: .06em;
+      font-weight: 800;
+      border: 1px solid rgba(255,255,255,.14);
+      padding: 4px 7px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.16);
+      white-space: nowrap;
+    }
+
+    .attention-list, .touch-list, .metric-list { display: grid; gap: 10px; position: relative; z-index: 1; }
+
+    .attention-item, .touch-item, .metric-item {
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .attention-item { border-left: 5px solid var(--red); }
+    .attention-item.medium { border-left-color: var(--orange); }
+    .attention-item.low { border-left-color: var(--yellow); }
+
+    .item-title { font-weight: 900; font-size: .95rem; }
+    .item-sub { margin-top: 4px; color: var(--muted); font-size: .82rem; line-height: 1.35; }
+    .item-meta { margin-top: 8px; color: var(--yellow); font-size: .75rem; font-weight: 850; }
+
+    .hero-art-card {
+      min-height: 260px;
+      padding: 16px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+      gap: 12px;
+    }
+
+    .poster-wrap {
+      position: relative;
+      z-index: 1;
+      border-radius: 20px;
+      min-height: 178px;
+      background:
+        linear-gradient(135deg, rgba(255,79,184,.12), rgba(53,217,255,.10)),
+        rgba(0,0,0,.18);
+      border: 1px dashed rgba(255,215,94,.36);
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+    }
+
+    .poster-art { min-height: 145px; display: grid; place-items: center; }
+    .poster-note {
+      align-self: center;
+      background: #ffe56a;
+      color: #151515;
+      transform: rotate(-2deg);
+      border-radius: 8px;
+      padding: 16px;
+      font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
+      font-weight: 950;
+      font-size: clamp(1.05rem, 1.4vw, 1.45rem);
+      line-height: 1.05;
+      box-shadow: 0 12px 28px rgba(0,0,0,.32);
+      text-align: center;
+    }
+
+    .calendar {
+      padding: 18px;
+      display: grid;
+      grid-template-rows: auto 1fr 1fr;
+      gap: 14px;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .calendar-header h2 { margin: 0; font-size: 1.15rem; color: var(--cyan); letter-spacing: .12em; text-transform: uppercase; }
+    .date-chip { color: var(--yellow); font-weight: 900; }
+
+    .schedule-section {
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px;
+      padding: 14px;
+      background: rgba(0,0,0,.16);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 10px;
+      min-height: 270px;
+    }
+
+    .person-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 950;
+      color: var(--pink);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .day {
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 16px;
+      padding: 12px;
+      min-height: 190px;
+    }
+
+    .day-name { font-weight: 950; color: var(--yellow); margin-bottom: 10px; }
+    .event {
+      font-size: .78rem;
+      color: var(--ink);
+      line-height: 1.3;
+      padding: 8px;
+      border-radius: 10px;
+      background: rgba(53,217,255,.08);
+      border-left: 3px solid var(--cyan);
+      margin-bottom: 8px;
+    }
+    .event.money { border-left-color: var(--green); background: rgba(102,242,154,.08); }
+    .event.warn { border-left-color: var(--orange); background: rgba(255,140,66,.08); }
+
+    .nav-card { padding: 18px; }
+    .nav-card h2 { color: var(--yellow); }
+
+    .metric-big {
+      position: relative;
+      z-index: 1;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(0,0,0,.18);
+      margin-bottom: 12px;
+    }
+
+    .metric-label { color: var(--muted); font-weight: 800; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
+    .metric-value { font-size: 2rem; font-weight: 950; margin-top: 4px; }
+    .metric-value.green { color: var(--green); }
+    .metric-value.red { color: var(--red); }
+    .metric-value.cyan { color: var(--cyan); }
+    .metric-note { color: var(--muted); font-size: .78rem; margin-top: 4px; }
+
+    .loadbar {
+      height: 16px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.10);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.13);
+      margin-top: 10px;
+    }
+    .loadbar > div {
+      height: 100%;
+      width: var(--p, 50%);
+      background: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow));
+      box-shadow: 0 0 20px rgba(255,79,184,.35);
+    }
+
+    .botbar {
+      padding: 14px;
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+    }
+
+    .bot {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 10px;
+      align-items: center;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 18px;
+      padding: 10px;
+      background: rgba(0,0,0,.18);
+      min-height: 84px;
+    }
+
+    .bot-avatar {
+      height: 54px;
+      width: 54px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.25);
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,.05);
+      font-size: 1.65rem;
+    }
+    .bot-name { font-weight: 950; color: var(--cyan); font-size: .86rem; }
+    .bot-desc { color: var(--muted); font-size: .72rem; line-height: 1.25; margin-top: 3px; }
+
+    .asset-note {
+      position: relative;
+      z-index: 1;
+      color: var(--muted);
+      font-size: .75rem;
+      line-height: 1.35;
+    }
+
+    @media (max-width: 1200px) {
+      .main-grid { grid-template-columns: 1fr; }
+      .botbar { grid-template-columns: repeat(2, 1fr); }
+      .header { grid-template-columns: 1fr; }
+      .art-slot { min-height: 70px; }
+    }
+  </style>
 </head>
-
 <body>
+  <main class="app">
+    <header class="header panel">
+      <div class="art-slot bicycle-slot" data-asset="assets/bicycle-left.png">
+        🚲<br />ART SLOT<br />bicycle-left.png
+      </div>
+      <div class="brand-center">
+        <h1 class="brand-title">Handley Man Command Center</h1>
+        <div class="brand-subtitle">Home Repair • Electrical • Circular Construction • New Urbanism</div>
+      </div>
+      <div class="art-slot chicken-slot" data-asset="assets/chicken-right.png">
+        🐔<br />ART SLOT<br />chicken-right.png
+      </div>
+    </header>
 
-<div class="shell">
+    <section class="main-grid">
+      <aside class="stack">
+        <section class="card panel">
+          <h2>Attention Required <span class="source-tag">!mbraindump → Important</span></h2>
+          <div class="attention-list">
+            <div class="attention-item">
+              <div class="item-title">Reply to CPS before application closes</div>
+              <div class="item-sub">Manual important item. Later this can become automated.</div>
+              <div class="item-meta">Owner: Daniel • Due: Friday</div>
+            </div>
+            <div class="attention-item medium">
+              <div class="item-title">Gardina permit coordination</div>
+              <div class="item-sub">Clarify next city/CPS step and update project notes.</div>
+              <div class="item-meta">Owner: Daniel • Due: This week</div>
+            </div>
+            <div class="attention-item low">
+              <div class="item-title">125 Claremont / Matias follow-up</div>
+              <div class="item-sub">Deconstruction proposal and next-user coordination.</div>
+              <div class="item-meta">Owner: Heaven • Due: Monday</div>
+            </div>
+          </div>
+        </section>
 
-  <!-- LEFT COLUMN -->
-  <div class="left">
+        <section class="card panel">
+          <h2>Daily Phone Target <span class="source-tag">Chismebot</span></h2>
+          <div class="metric-big">
+            <div class="metric-label">Numbers touched today</div>
+            <div class="metric-value cyan">12 / 20</div>
+            <div class="loadbar" aria-label="Phone target progress"><div style="--p:60%"></div></div>
+            <div class="metric-note">Goal: enrich records first. Estimates are bonus points.</div>
+          </div>
+          <div class="touch-list">
+            <div class="touch-item">
+              <div class="item-title">Next: Mary Smith</div>
+              <div class="item-sub">Ask about July fence project. Add chisme after call.</div>
+            </div>
+            <div class="touch-item">
+              <div class="item-title">Next: Dr. Garcia</div>
+              <div class="item-sub">Lightning damage, moisture staining, entertainment center.</div>
+            </div>
+          </div>
+        </section>
 
-    <div class="frame-wrap">
-      <iframe src="https://mrsbohemian.github.io/command-center/task_accounting_module.html"></iframe>
-    </div>
+        <section class="hero-art-card panel">
+          <div class="poster-wrap">
+            <div class="poster-art art-slot" data-asset="assets/chicken-postit-sugarskull.png">
+              🐔 💀 🌼<br />ART SLOT<br />chicken + sugar skull + flowers
+            </div>
+            <div class="poster-note">Slow is smooth.<br />Smooth is fast.</div>
+          </div>
+          <div class="asset-note">This panel is intentionally reserved for custom artwork: chicken, sugar skull, florals, and Handley Man folk-art details.</div>
+        </section>
+      </aside>
 
-    <div class="frame-wrap">
-      <iframe src="https://mrsbohemian.github.io/command-center/customer_tracking_module.html"></iframe>
-    </div>
+      <section class="calendar panel">
+        <div class="calendar-header">
+          <h2>4-Day Schedule</h2>
+          <div class="date-chip">Handley Man Schedule</div>
+        </div>
 
-    <div class="frame-wrap">
-      <iframe src="https://mrsbohemian.github.io/command-center/data_visualization_carousel.html"></iframe>
-    </div>
+        <div class="schedule-section">
+          <div class="person-label">Heaven <span class="source-tag">!mschedule</span></div>
+          <div class="schedule-grid">
+            <div class="day"><div class="day-name">Mon</div><div class="event money">Website estimate follow-up</div><div class="event">SACA / admin block</div><div class="event warn">Command Center dev notes</div></div>
+            <div class="day"><div class="day-name">Tue</div><div class="event money">In-person estimate</div><div class="event">Circular SA coordination</div></div>
+            <div class="day"><div class="day-name">Wed</div><div class="event">Cholobots dev day</div><div class="event warn">Important dump review</div></div>
+            <div class="day"><div class="day-name">Thu</div><div class="event money">Proposal / HCP writing</div><div class="event">Family + household rhythm</div></div>
+          </div>
+        </div>
 
-  </div>
+        <div class="schedule-section">
+          <div class="person-label">Daniel <span class="source-tag">!mschedule</span></div>
+          <div class="schedule-grid">
+            <div class="day"><div class="day-name">Mon</div><div class="event warn">CPS reply / city coordination</div><div class="event money">Vasquez work block</div></div>
+            <div class="day"><div class="day-name">Tue</div><div class="event money">Gardina electrical</div><div class="event">Phone target: 20 numbers</div></div>
+            <div class="day"><div class="day-name">Wed</div><div class="event warn">Bryn Mawr permit follow-up</div><div class="event">Phone target: 20 numbers</div></div>
+            <div class="day"><div class="day-name">Thu</div><div class="event money">Service calls / ceiling fans</div><div class="event">Chisme updates</div></div>
+          </div>
+        </div>
+      </section>
 
-  <!-- RIGHT COLUMN -->
-  <div class="right">
-    <div class="frame-wrap" style="height:100%;">
-      <iframe src="https://mrsbohemian.github.io/command-center/command_center_calendar_module.html?v=4"></iframe>
-    </div>
-  </div>
+      <aside class="stack">
+        <section class="nav-card panel">
+          <h2>Navigation Dashboard <span class="source-tag">!mweekly + !mgoals</span></h2>
+          <div class="metric-big">
+            <div class="metric-label">Weekly target</div>
+            <div class="metric-value">$2,500</div>
+            <div class="metric-note">Target can be modified in !mgoals.</div>
+          </div>
+          <div class="metric-big">
+            <div class="metric-label">Booked / expected this week</div>
+            <div class="metric-value green">$1,800</div>
+            <div class="loadbar"><div style="--p:72%"></div></div>
+          </div>
+          <div class="metric-big">
+            <div class="metric-label">Gap remaining</div>
+            <div class="metric-value red">$700</div>
+            <div class="metric-note">This determines whether the week needs leads, estimates, or collections.</div>
+          </div>
+          <div class="metric-big">
+            <div class="metric-label">Runway created after gap closes</div>
+            <div class="metric-value cyan">0.4 weeks</div>
+            <div class="metric-note">How much pressure gets pushed off next week.</div>
+          </div>
+          <div class="metric-big">
+            <div class="metric-label">Jobs needed at current average</div>
+            <div class="metric-value">2</div>
+            <div class="metric-note">Based on current average job value from !mweekly/ObiJuan.</div>
+          </div>
+        </section>
+      </aside>
+    </section>
 
-</div>
-
+    <footer class="botbar panel">
+      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-metichebot.png">💀</div><div><div class="bot-name">Metichebot</div><div class="bot-desc">Currently the most used bot.</div></div></div>
+      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-chismebot.png">📞</div><div><div class="bot-name">Chismebot</div><div class="bot-desc">Competing with Metichebot.</div></div></div>
+      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-guardabot.png">🛡️</div><div><div class="bot-name">Guardabot</div><div class="bot-desc">Ready and waiting to be used.</div></div></div>
+      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-crudobot.png">🔮</div><div><div class="bot-name">Crudobot</div><div class="bot-desc">Chill and waiting to provide unfiltered wisdom.</div></div></div>
+      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-vueltabot.png">♻️</div><div><div class="bot-name">Vueltabot</div><div class="bot-desc">Here to make circularity real.</div></div></div>
+      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-obijuan.png">⚔️</div><div><div class="bot-name">ObiJuan</div><div class="bot-desc">Ready to help you with your mission.</div></div></div>
+    </footer>
+  </main>
 </body>
 </html>
