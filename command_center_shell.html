@@ -6,12 +6,12 @@
   <title>Handley Man Command Center</title>
   <style>
     :root {
-      --bg: #080914;
-      --panel: rgba(17, 24, 42, 0.92);
-      --panel2: rgba(22, 31, 54, 0.88);
+      --bg: #000;
+      --panel: rgba(9, 16, 33, 0.95);
+      --panel2: rgba(14, 25, 50, 0.92);
       --ink: #fff7dc;
       --muted: #bfc2d6;
-      --line: rgba(255,255,255,.14);
+      --line: rgba(90, 217, 255, .22);
       --pink: #ff4fb8;
       --cyan: #35d9ff;
       --yellow: #ffd75e;
@@ -19,28 +19,32 @@
       --green: #66f29a;
       --purple: #9f7aff;
       --red: #ff5c7a;
-      --radius: 22px;
-      --shadow: 0 18px 50px rgba(0,0,0,.42);
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.55);
     }
 
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
+      width: 100%;
+      height: 100%;
       margin: 0;
-      min-height: 100vh;
+      overflow: hidden;
+      background: #000;
+    }
+
+    body {
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       color: var(--ink);
-      background: #000;
-      padding: 18px;
-      overflow-x: hidden;
+      padding: 10px;
     }
 
     .app {
-      max-width: 1740px;
-      margin: 0 auto;
+      height: calc(100vh - 20px);
+      width: 100%;
       display: grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 16px;
+      grid-template-rows: 108px 1fr 24px;
+      gap: 10px;
     }
 
     .panel {
@@ -56,250 +60,174 @@
       content: "";
       position: absolute;
       inset: 0;
-      background: radial-gradient(circle at top left, rgba(255,255,255,.08), transparent 32%);
+      background: radial-gradient(circle at top left, rgba(255,255,255,.08), transparent 34%);
       pointer-events: none;
     }
 
     .header {
-      min-height: 100px;
       display: grid;
       grid-template-columns: 150px 1fr 150px;
       align-items: center;
-      gap: 14px;
-      padding: 12px 18px;
-    }
-
-    .brand-center { text-align: center; z-index: 1; }
-
-    .brand-title {
-      margin: 0;
-      font-size: clamp(2rem, 4.2vw, 4.7rem);
-      line-height: .92;
-      letter-spacing: .02em;
-      font-weight: 950;
-      text-transform: uppercase;
-      text-shadow: 0 0 18px rgba(53,217,255,.25), 0 0 12px rgba(255,79,184,.20);
-    }
-
-    .brand-subtitle {
-      margin-top: 10px;
-      color: var(--yellow);
-      font-weight: 850;
-      letter-spacing: .14em;
-      text-transform: uppercase;
-      font-size: clamp(.74rem, 1.05vw, 1rem);
+      gap: 16px;
+      padding: 10px 18px;
     }
 
     .art-slot {
       z-index: 1;
-      min-height: 86px;
-      border: 1px dashed rgba(255,255,255,.24);
-      border-radius: 20px;
+      height: 82px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.18);
       display: grid;
       place-items: center;
-      background: rgba(255,255,255,.04);
-      color: rgba(255,247,220,.82);
-      font-size: .82rem;
-      font-weight: 800;
-      text-align: center;
-      padding: 10px;
+      background: rgba(0,0,0,.25);
     }
 
-    
+    .bicycle-slot { border-color: rgba(53,217,255,.55); }
+    .chicken-slot { border-color: rgba(255,140,66,.55); }
+
     .art-slot img {
       width: 100%;
       height: 100%;
-      max-height: 140px;
+      max-height: 76px;
       object-fit: contain;
       display: block;
     }
-    .bicycle-slot { border-color: rgba(53,217,255,.35); }
-    .chicken-slot { border-color: rgba(255,140,66,.38); }
+
+    .brand-center {
+      z-index: 1;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .brand-title {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 4.2rem);
+      line-height: .86;
+      letter-spacing: .03em;
+      font-weight: 950;
+      text-transform: uppercase;
+      text-shadow: 0 0 16px rgba(53,217,255,.32), 0 0 12px rgba(255,79,184,.24);
+    }
+
+    .brand-subtitle-row {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      min-width: 0;
+    }
+
+    .brand-subtitle {
+      color: var(--yellow);
+      font-weight: 900;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      font-size: clamp(.58rem, .9vw, .86rem);
+      white-space: nowrap;
+    }
+
+    .skull-accent {
+      width: 38px;
+      height: 38px;
+      object-fit: contain;
+      flex: 0 0 auto;
+      filter: drop-shadow(0 0 8px rgba(255,215,94,.35));
+    }
 
     .main-grid {
+      min-height: 0;
       display: grid;
-      grid-template-columns: minmax(300px, .82fr) minmax(600px, 1.45fr) minmax(330px, .9fr);
-      gap: 12px;
-      min-height: auto;
+      grid-template-columns: 29% 42% 29%;
+      gap: 10px;
     }
-    .stack { display: grid; gap: 16px; }
 
-    .card { padding: 18px; }
+    .stack {
+      min-height: 0;
+      display: grid;
+      gap: 10px;
+    }
 
-    .card h2 {
-      margin: 0 0 14px;
-      font-size: 1rem;
+    .left-stack { grid-template-rows: 1.08fr .92fr; }
+    .right-stack { grid-template-rows: 1fr; }
+
+    .card, .calendar, .nav-card { padding: 14px; }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: clamp(.75rem, 1.05vw, 1rem);
+      line-height: 1;
       text-transform: uppercase;
       letter-spacing: .12em;
       color: var(--cyan);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
-      z-index: 1;
+      gap: 10px;
       position: relative;
+      z-index: 1;
     }
+
+    .attention-card h2 { color: var(--pink); }
+    .nav-card h2 { color: var(--cyan); }
 
     .source-tag {
       color: var(--muted);
-      font-size: .68rem;
+      font-size: .58rem;
       letter-spacing: .06em;
-      font-weight: 800;
+      font-weight: 900;
       border: 1px solid rgba(255,255,255,.14);
       padding: 4px 7px;
       border-radius: 999px;
-      background: rgba(0,0,0,.16);
+      background: rgba(0,0,0,.18);
       white-space: nowrap;
     }
 
-    .attention-list, .touch-list, .metric-list { display: grid; gap: 10px; position: relative; z-index: 1; }
+    .attention-list, .touch-list, .metric-list {
+      display: grid;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
 
-    .attention-item, .touch-item, .metric-item {
+    .attention-item, .touch-item, .metric-big {
       border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.18);
-      border-radius: 16px;
-      padding: 12px;
+      background: rgba(0,0,0,.20);
+      border-radius: 14px;
+      padding: 10px;
     }
 
     .attention-item { border-left: 5px solid var(--red); }
     .attention-item.medium { border-left-color: var(--orange); }
     .attention-item.low { border-left-color: var(--yellow); }
 
-    .item-title { font-weight: 900; font-size: .95rem; }
-    .item-sub { margin-top: 4px; color: var(--muted); font-size: .82rem; line-height: 1.35; }
-    .item-meta { margin-top: 8px; color: var(--yellow); font-size: .75rem; font-weight: 850; }
+    .item-title { font-weight: 950; font-size: clamp(.72rem, .9vw, .9rem); }
+    .item-sub { margin-top: 4px; color: var(--muted); font-size: clamp(.58rem, .72vw, .75rem); line-height: 1.25; }
+    .item-meta { margin-top: 6px; color: var(--yellow); font-size: clamp(.56rem, .68vw, .72rem); font-weight: 900; }
 
-    .hero-art-card {
-      min-height: 260px;
-      padding: 16px;
+    .phone-card {
       display: grid;
-      grid-template-rows: 1fr auto;
-      gap: 12px;
+      grid-template-rows: auto auto 1fr;
+      min-height: 0;
     }
 
-    .poster-wrap {
-      position: relative;
-      z-index: 1;
-      border-radius: 20px;
-      min-height: 178px;
-      background:
-        linear-gradient(135deg, rgba(255,79,184,.12), rgba(53,217,255,.10)),
-        rgba(0,0,0,.18);
-      border: 1px dashed rgba(255,215,94,.36);
-      display: grid;
-      grid-template-columns: 1fr 1.1fr;
-      align-items: center;
-      gap: 12px;
-      padding: 14px;
-    }
-
-    .poster-art { min-height: 145px; display: grid; place-items: center; }
-    .poster-note {
-      align-self: center;
-      background: #ffe56a;
-      color: #151515;
-      transform: rotate(-2deg);
-      border-radius: 8px;
-      padding: 16px;
-      font-family: "Comic Sans MS", "Trebuchet MS", sans-serif;
+    .phone-number {
+      font-size: clamp(1.8rem, 3vw, 3rem);
+      color: var(--cyan);
       font-weight: 950;
-      font-size: clamp(1.05rem, 1.4vw, 1.45rem);
-      line-height: 1.05;
-      box-shadow: 0 12px 28px rgba(0,0,0,.32);
-      text-align: center;
+      line-height: 1;
+      margin-top: 4px;
     }
 
-    .calendar {
-      padding: 14px;
-      display: grid;
-      grid-template-rows: auto 1fr 1fr;
-      gap: 10px;
-    }
-
-    .calendar-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .calendar-header h2 { margin: 0; font-size: 1.15rem; color: var(--cyan); letter-spacing: .12em; text-transform: uppercase; }
-    .date-chip { color: var(--yellow); font-weight: 900; }
-
-    .schedule-section {
-      position: relative;
-      z-index: 1;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 20px;
-      padding: 14px;
-      background: rgba(0,0,0,.16);
-      display: grid;
-      grid-template-rows: auto 1fr;
-      gap: 10px;
-      min-height: 220px;
-    }
-
-    .person-label {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-weight: 950;
-      color: var(--pink);
-      text-transform: uppercase;
-      letter-spacing: .12em;
-    }
-
-    .schedule-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 10px;
-    }
-
-    .day {
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 16px;
-      padding: 12px;
-      min-height: 190px;
-    }
-
-    .day-name { font-weight: 950; color: var(--yellow); margin-bottom: 10px; }
-    .event {
-      font-size: .78rem;
-      color: var(--ink);
-      line-height: 1.3;
-      padding: 8px;
-      border-radius: 10px;
-      background: rgba(53,217,255,.08);
-      border-left: 3px solid var(--cyan);
-      margin-bottom: 8px;
-    }
-    .event.money { border-left-color: var(--green); background: rgba(102,242,154,.08); }
-    .event.warn { border-left-color: var(--orange); background: rgba(255,140,66,.08); }
-
-    .nav-card { padding: 18px; }
-    .nav-card h2 { color: var(--yellow); }
-
-    .metric-big {
-      position: relative;
-      z-index: 1;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      padding: 14px;
-      background: rgba(0,0,0,.18);
-      margin-bottom: 12px;
-    }
-
-    .metric-label { color: var(--muted); font-weight: 800; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; }
-    .metric-value { font-size: 2rem; font-weight: 950; margin-top: 4px; }
+    .metric-label { color: var(--muted); font-weight: 900; font-size: .66rem; text-transform: uppercase; letter-spacing: .10em; }
+    .metric-value { font-size: clamp(1.4rem, 2.2vw, 2.25rem); font-weight: 950; margin-top: 4px; }
     .metric-value.green { color: var(--green); }
     .metric-value.red { color: var(--red); }
     .metric-value.cyan { color: var(--cyan); }
-    .metric-note { color: var(--muted); font-size: .78rem; margin-top: 4px; }
+    .metric-note { color: var(--muted); font-size: clamp(.56rem, .72vw, .74rem); margin-top: 4px; line-height: 1.25; }
 
     .loadbar {
-      height: 16px;
+      height: 12px;
       border-radius: 999px;
       background: rgba(255,255,255,.10);
       overflow: hidden;
@@ -310,56 +238,108 @@
       height: 100%;
       width: var(--p, 50%);
       background: linear-gradient(90deg, var(--pink), var(--orange), var(--yellow));
-      box-shadow: 0 0 20px rgba(255,79,184,.35);
+      box-shadow: 0 0 18px rgba(255,79,184,.32);
     }
 
-    .botbar {
-      padding: 14px;
+    .calendar {
       display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 12px;
-    }
-
-    .bot {
-      position: relative;
-      z-index: 1;
-      display: grid;
-      grid-template-columns: 58px 1fr;
+      grid-template-rows: auto 1fr 1fr;
       gap: 10px;
+      min-height: 0;
+    }
+
+    .calendar-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      padding: 10px;
-      background: rgba(0,0,0,.18);
-      min-height: 84px;
-    }
-
-    .bot-avatar {
-      height: 54px;
-      width: 54px;
-      border-radius: 16px;
-      border: 1px dashed rgba(255,255,255,.25);
-      display: grid;
-      place-items: center;
-      background: rgba(255,255,255,.05);
-      font-size: 1.65rem;
-    }
-    .bot-name { font-weight: 950; color: var(--cyan); font-size: .86rem; }
-    .bot-desc { color: var(--muted); font-size: .72rem; line-height: 1.25; margin-top: 3px; }
-
-    .asset-note {
       position: relative;
       z-index: 1;
-      color: var(--muted);
-      font-size: .75rem;
-      line-height: 1.35;
+    }
+
+    .calendar-header h2 { margin: 0; color: var(--cyan); }
+    .date-chip { color: var(--yellow); font-weight: 950; font-size: .8rem; }
+
+    .schedule-section {
+      position: relative;
+      z-index: 1;
+      min-height: 0;
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 16px;
+      padding: 10px;
+      background: rgba(0,0,0,.16);
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 8px;
+    }
+
+    .person-label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 950;
+      color: var(--pink);
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      font-size: clamp(.72rem, .95vw, .92rem);
+    }
+
+    .schedule-grid {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .day {
+      min-height: 0;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 13px;
+      padding: 8px;
+      overflow: hidden;
+    }
+
+    .day-name { font-weight: 950; color: var(--yellow); margin-bottom: 7px; font-size: clamp(.7rem, .9vw, .9rem); }
+    .event {
+      font-size: clamp(.54rem, .68vw, .72rem);
+      color: var(--ink);
+      line-height: 1.2;
+      padding: 6px;
+      border-radius: 8px;
+      background: rgba(53,217,255,.10);
+      border-left: 3px solid var(--cyan);
+      margin-bottom: 6px;
+    }
+    .event.money { border-left-color: var(--green); background: rgba(102,242,154,.10); }
+    .event.warn { border-left-color: var(--orange); background: rgba(255,140,66,.10); }
+
+    .nav-card {
+      display: grid;
+      grid-template-rows: auto repeat(5, 1fr);
+      gap: 9px;
+      min-height: 0;
+    }
+
+    .nav-card .metric-big { margin: 0; }
+
+    .footer-line {
+      text-align: center;
+      color: var(--yellow);
+      font-size: .76rem;
+      letter-spacing: .14em;
+      font-weight: 950;
+      text-transform: uppercase;
+      line-height: 24px;
     }
 
     @media (max-width: 1200px) {
+      html, body { overflow: auto; }
+      .app { height: auto; grid-template-rows: auto auto auto; }
       .main-grid { grid-template-columns: 1fr; }
-      .botbar { grid-template-columns: repeat(2, 1fr); }
-      .header { grid-template-columns: 1fr; }
-      .art-slot { min-height: 70px; }
+      .header { grid-template-columns: 1fr; height: auto; }
+      .art-slot { height: 70px; }
+      .brand-subtitle-row { flex-wrap: wrap; }
+      .skull-accent { width: 34px; height: 34px; }
     }
   </style>
 </head>
@@ -370,17 +350,22 @@
         <img src="assets/bicycle-left.png" alt="Bicycle" />
       </div>
       <div class="brand-center">
-        <h1 class="brand-title">Handley Man Command Center</h1>
-        <div class="brand-subtitle">Home Repair • Electrical • Circular Construction • New Urbanism</div>
-      </div><div class="art-slot chicken-slot">
+        <h1 class="brand-title">Handley Man<br />Command Center</h1>
+        <div class="brand-subtitle-row">
+          <span class="brand-subtitle">Home Repair • Electrical</span>
+          <img class="skull-accent" src="assets/sugarskull.png" alt="Sugar skull" />
+          <span class="brand-subtitle">Circular Construction • New Urbanism</span>
+        </div>
+      </div>
+      <div class="art-slot chicken-slot">
         <img src="assets/chicken-right.png" alt="Chicken" />
       </div>
     </header>
 
     <section class="main-grid">
-      <aside class="stack">
-        <section class="card panel">
-          <h2>Attention Required <span class="source-tag">!mbraindump → Important</span></h2>
+      <aside class="stack left-stack">
+        <section class="card panel attention-card">
+          <h2>Attention Required <span class="source-tag">Important</span></h2>
           <div class="attention-list">
             <div class="attention-item">
               <div class="item-title">Reply to CPS before application closes</div>
@@ -400,33 +385,24 @@
           </div>
         </section>
 
-        <section class="card panel">
+        <section class="card panel phone-card">
           <h2>Daily Phone Target <span class="source-tag">Chismebot</span></h2>
           <div class="metric-big">
             <div class="metric-label">Numbers touched today</div>
-            <div class="metric-value cyan">12 / 20</div>
+            <div class="phone-number">12 / 20</div>
             <div class="loadbar" aria-label="Phone target progress"><div style="--p:60%"></div></div>
             <div class="metric-note">Goal: enrich records first. Estimates are bonus points.</div>
           </div>
           <div class="touch-list">
             <div class="touch-item">
-              <div class="item-title">Next: Mary Smith</div>
+              <div class="item-title">☎ Next: Mary Smith</div>
               <div class="item-sub">Ask about July fence project. Add chisme after call.</div>
             </div>
             <div class="touch-item">
-              <div class="item-title">Next: Dr. Garcia</div>
+              <div class="item-title">☎ Next: Dr. Garcia</div>
               <div class="item-sub">Lightning damage, moisture staining, entertainment center.</div>
             </div>
           </div>
-        </section>
-
-        <section class="hero-art-card panel">
-          <div class="poster-wrap">
-            <div class="poster-art art-slot" data-asset="assets/sugarskull.png">
-            </div>
-            <div class="poster-note">Slow is smooth.<br />Smooth is fast.</div>
-          </div>
-          <div class="asset-note">This panel is intentionally reserved for custom artwork: chicken, sugar skull, florals, and Handley Man folk-art details.</div>
         </section>
       </aside>
 
@@ -457,12 +433,12 @@
         </div>
       </section>
 
-      <aside class="stack">
+      <aside class="stack right-stack">
         <section class="nav-card panel">
-          <h2>Navigation Dashboard <span class="source-tag">!mweekly + !mgoals</span></h2>
+          <h2>Navigation Dashboard <span class="source-tag">Weekly</span></h2>
           <div class="metric-big">
             <div class="metric-label">Weekly target</div>
-            <div class="metric-value">$2,500</div>
+            <div class="metric-value cyan">$2,500</div>
             <div class="metric-note">Target can be modified in !mgoals.</div>
           </div>
           <div class="metric-big">
@@ -489,14 +465,7 @@
       </aside>
     </section>
 
-    <footer class="botbar panel">
-      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-metichebot.png">💀</div><div><div class="bot-name">Metichebot</div><div class="bot-desc">Currently the most used bot.</div></div></div>
-      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-chismebot.png">📞</div><div><div class="bot-name">Chismebot</div><div class="bot-desc">Competing with Metichebot.</div></div></div>
-      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-guardabot.png">🛡️</div><div><div class="bot-name">Guardabot</div><div class="bot-desc">Ready and waiting to be used.</div></div></div>
-      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-crudobot.png">🔮</div><div><div class="bot-name">Crudobot</div><div class="bot-desc">Chill and waiting to provide unfiltered wisdom.</div></div></div>
-      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-vueltabot.png">♻️</div><div><div class="bot-name">Vueltabot</div><div class="bot-desc">Here to make circularity real.</div></div></div>
-      <div class="bot"><div class="bot-avatar" data-asset="assets/bot-obijuan.png">⚔️</div><div><div class="bot-name">ObiJuan</div><div class="bot-desc">Ready to help you with your mission.</div></div></div>
-    </footer>
+    <footer class="footer-line">Built for clarity. Driven by chisme. Focused on flow.</footer>
   </main>
 </body>
 </html>
