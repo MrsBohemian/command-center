@@ -357,6 +357,91 @@
 }
   </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+  const SUPABASE_URL = "https://pjquistiolcoqvcfmqjn.supabase.co";
+  const SUPABASE_ANON_KEY = "sb_publishable_SrGvJETp3Bpm9i9n1wGheQ_3Ni7FdIv";
+
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  function formatDayLabel(dateString) {
+    const date = new Date(dateString + "T12:00:00");
+    return date.toLocaleDateString("en-US", { weekday: "short" });
+  }
+
+  function getNextFourDates() {
+    const dates = [];
+    const today = new Date();
+
+    for (let i = 0; i < 4; i++) {
+      const d = new Date(today);
+      d.setDate(today.getDate() + i);
+      dates.push(d.toISOString().slice(0, 10));
+    }
+
+    return dates;
+  }
+
+  function renderPersonSchedule(containerId, personSchedule) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = "";
+
+    const dates = getNextFourDates();
+
+    dates.forEach(dateKey => {
+      const dayBox = document.createElement("div");
+      dayBox.className = "day";
+
+      const dayName = document.createElement("div");
+      dayName.className = "day-name";
+      dayName.textContent = formatDayLabel(dateKey);
+
+      dayBox.appendChild(dayName);
+
+      const tasks = personSchedule?.[dateKey] || [];
+
+      if (tasks.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "event";
+        empty.textContent = "Open";
+        dayBox.appendChild(empty);
+      } else {
+        tasks.forEach(task => {
+          const event = document.createElement("div");
+          event.className = "event";
+          event.textContent = task.text || task.task || String(task);
+          dayBox.appendChild(event);
+        });
+      }
+
+      container.appendChild(dayBox);
+    });
+  }
+
+  async function loadMeticheSchedule() {
+    const { data, error } = await supabaseClient
+      .from("metiche_weekly")
+      .select("calendar_json, created_at")
+      .order("id", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error("Metiche schedule load failed:", error);
+      return;
+    }
+
+    const calendar = data.calendar_json || {};
+
+    renderPersonSchedule("heaven-schedule", calendar.Heaven || {});
+    renderPersonSchedule("daniel-schedule", calendar.Daniel || {});
+  }
+
+  loadMeticheSchedule();
+  setInterval(loadMeticheSchedule, 60000);
+</script>  
+  
 <body>
   <main class="app">
     <header class="header panel">
@@ -428,22 +513,12 @@
 
         <div class="schedule-section">
           <div class="person-label">Heaven <span class="source-tag">!mschedule</span></div>
-          <div class="schedule-grid">
-            <div class="day"><div class="day-name">Mon</div><div class="event money">Website estimate follow-up</div><div class="event">SACA / admin block</div><div class="event warn">Command Center dev notes</div></div>
-            <div class="day"><div class="day-name">Tue</div><div class="event money">In-person estimate</div><div class="event">Circular SA coordination</div></div>
-            <div class="day"><div class="day-name">Wed</div><div class="event">Cholobots dev day</div><div class="event warn">Important dump review</div></div>
-            <div class="day"><div class="day-name">Thu</div><div class="event money">Proposal / HCP writing</div><div class="event">Family + household rhythm</div></div>
-          </div>
+          <div class="schedule-grid" id="heaven-schedule"></div>
         </div>
 
         <div class="schedule-section">
           <div class="person-label">Daniel <span class="source-tag">!mschedule</span></div>
-          <div class="schedule-grid">
-            <div class="day"><div class="day-name">Mon</div><div class="event warn">CPS reply / city coordination</div><div class="event money">Vasquez work block</div></div>
-            <div class="day"><div class="day-name">Tue</div><div class="event money">Gardina electrical</div><div class="event">Phone target: 20 numbers</div></div>
-            <div class="day"><div class="day-name">Wed</div><div class="event warn">Bryn Mawr permit follow-up</div><div class="event">Phone target: 20 numbers</div></div>
-            <div class="day"><div class="day-name">Thu</div><div class="event money">Service calls / ceiling fans</div><div class="event">Chisme updates</div></div>
-          </div>
+          <div class="schedule-grid" id="daniel-schedule"></div>
         </div>
       </section>
 
