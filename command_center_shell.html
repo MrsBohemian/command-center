@@ -443,28 +443,30 @@
           <h2>Navigation Dashboard <span class="source-tag">Weekly</span></h2>
           <div class="metric-big">
             <div class="metric-label">Weekly target</div>
-            <div class="metric-value cyan">$2,500</div>
+            <div class="metric-value cyan" id="weekly-target">$0</div>
             <div class="metric-note">Target can be modified in !mgoals.</div>
           </div>
           <div class="metric-big">
             <div class="metric-label">Booked / expected this week</div>
-            <div class="metric-value green">$1,800</div>
-            <div class="loadbar"><div style="--p:72%"></div></div>
+            <div class="metric-value green" id="booked-amount">$0</div>
+            <div class="loadbar"><div id="booked-bar" style="--p:0%"></div></div>
           </div>
           <div class="metric-big">
             <div class="metric-label">Gap remaining</div>
-            <div class="metric-value red">$700</div>
+            <div class="metric-value red" id="gap-remaining">$0</div>
             <div class="metric-note">This determines whether the week needs leads, estimates, or collections.</div>
           </div>
           <div class="metric-big">
             <div class="metric-label">Runway created after gap closes</div>
-            <div class="metric-value cyan">0.4 weeks</div>
+            <div class="metric-value cyan" id="runway-weeks">0 weeks</div>
             <div class="metric-note">How much pressure gets pushed off next week.</div>
           </div>
           <div class="metric-big">
-            <div class="metric-label">Jobs needed at current average</div>
-            <div class="metric-value">2</div>
-            <div class="metric-note">Based on current average job value from !mweekly/ObiJuan.</div>
+            <div class="metric-label">Average Job Value</div>
+            <div class="metric-value" id="average-job-value">$0</div>
+            <div class="metric-note">
+            Moving average from completed Handley Man jobs.
+            </div>
           </div>
         </section>
       </aside>
