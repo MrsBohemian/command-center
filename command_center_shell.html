@@ -381,12 +381,7 @@
       <aside class="stack left-stack">
         <section class="card panel attention-card">
           <h2>Attention Required <span class="source-tag">Important</span></h2>
-          <div class="attention-list">
-            <div class="attention-item">
-              <div class="item-title">Reply to CPS before application closes</div>
-              <div class="item-sub">Manual important item. Later this can become automated.</div>
-              <div class="item-meta">Owner: Daniel • Due: Friday</div>
-            </div>
+          <div class="attention-list" id="attention-list"></div>
             <div class="attention-item medium">
               <div class="item-title">Gardina permit coordination</div>
               <div class="item-sub">Clarify next city/CPS step and update project notes.</div>
@@ -535,7 +530,51 @@
       container.appendChild(dayBox);
     });
   }
-
+  
+  async function loadImportantItems() {
+    const { data, error } = await supabaseClient
+      .from("metiche_important_items")
+      .select("id, person, item, created_at")
+      .eq("status", "open")
+      .order("created_at", { ascending: false })
+      .limit(5);
+  
+    if (error) {
+      console.error("Important items load failed:", error);
+      return;
+    }
+  
+    const container = document.getElementById("attention-list");
+    container.innerHTML = "";
+  
+    if (!data || data.length === 0) {
+      container.innerHTML = `
+        <div class="attention-item low">
+          <div class="item-title">No open important items</div>
+          <div class="item-sub">Nothing is parked in Attention Required.</div>
+          <div class="item-meta">Status: clear</div>
+        </div>
+      `;
+      return;
+    }
+  
+    data.forEach((row, index) => {
+      const div = document.createElement("div");
+      div.className =
+        index === 0 ? "attention-item" :
+        index === 1 ? "attention-item medium" :
+        "attention-item low";
+  
+      div.innerHTML = `
+        <div class="item-title">${row.item}</div>
+        <div class="item-sub">Important item from brain dump.</div>
+        <div class="item-meta">Owner: ${row.person || "Unassigned"} • Open</div>
+      `;
+  
+      container.appendChild(div);
+    });
+  }
+  
   async function loadMeticheSchedule() {
     const { data, error } = await supabaseClient
       .from("metiche_weekly")
@@ -574,9 +613,12 @@
   }
 
     window.addEventListener("DOMContentLoaded", () => {
-      loadMeticheSchedule();
-      setInterval(loadMeticheSchedule, 60000);
-  });
+    loadMeticheSchedule();
+    loadImportantItems();
+
+    setInterval(loadMeticheSchedule, 60000);
+    setInterval(loadImportantItems, 60000);
+});
 </script>  
 </body>
 </html>
