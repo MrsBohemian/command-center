@@ -612,12 +612,16 @@
     renderPersonSchedule("daniel-schedule", calendar.Daniel || {});
   }
 
-    window.addEventListener("DOMContentLoaded", () => {
+   window.addEventListener("DOMContentLoaded", () => {
     loadMeticheSchedule();
     loadImportantItems();
 
     setInterval(loadMeticheSchedule, 60000);
     setInterval(loadImportantItems, 60000);
+
+    setInterval(() => {
+        location.reload();
+    }, 300000); // 5 minutes
 });
 </script>  
 </body>
