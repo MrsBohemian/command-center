@@ -383,13 +383,9 @@
           <h2>Attention Required <span class="source-tag">Important</span></h2>
           <div class="attention-list" id="attention-list"></div>
             <div class="attention-item medium">
-              <div class="item-title">Gardina permit coordination</div>
-              <div class="item-sub">Clarify next city/CPS step and update project notes.</div>
               <div class="item-meta">Owner: Daniel • Due: This week</div>
             </div>
             <div class="attention-item low">
-              <div class="item-title">125 Claremont / Matias follow-up</div>
-              <div class="item-sub">Deconstruction proposal and next-user coordination.</div>
               <div class="item-meta">Owner: Heaven • Due: Monday</div>
             </div>
           </div>
@@ -397,23 +393,29 @@
 
         <section class="card panel phone-card">
           <h2>Daily Phone Target <span class="source-tag">Chismebot</span></h2>
+        
           <div class="metric-big">
-            <div class="metric-label">Numbers touched today</div>
-            <div class="phone-number">12 / 20</div>
-            <div class="loadbar" aria-label="Phone target progress"><div style="--p:60%"></div></div>
-            <div class="metric-note">Goal: enrich records first. Estimates are bonus points.</div>
+            <div class="metric-label">Customer communications today</div>
+            <div class="phone-number" id="chisme-progress">0 / 0</div>
+            <div class="loadbar" aria-label="Phone target progress">
+              <div id="chisme-bar" style="--p:0%"></div>
+            </div>
+            <div class="metric-note">Goal: complete today's bucketed customer communication queue.</div>
           </div>
+        
           <div class="touch-list">
             <div class="touch-item">
-              <div class="item-title">☎ Next: Mary Smith</div>
-              <div class="item-sub">Ask about July fence project. Add chisme after call.</div>
+              <div class="item-title" id="chisme-next-1">☎ Next: none</div>
+              <div class="item-sub" id="chisme-next-1-sub">No queued customer communication.</div>
             </div>
+        
             <div class="touch-item">
-              <div class="item-title">☎ Next: Dr. Garcia</div>
-              <div class="item-sub">Lightning damage, moisture staining, entertainment center.</div>
+              <div class="item-title" id="chisme-next-2">☎ Next: none</div>
+              <div class="item-sub" id="chisme-next-2-sub">No queued customer communication.</div>
             </div>
           </div>
         </section>
+        
       </aside>
 
       <section class="calendar panel">
@@ -444,7 +446,7 @@
           <div class="metric-big">
             <div class="metric-label">Booked / expected this week</div>
             <div class="metric-value green" id="booked-amount">$0</div>
-            <div class="loadbar"><div id="booked-bar" style="--p:0%"></div></div>
+            <div class="bar"><div id="booked-bar" style="--p:0%"></div></div>
           </div>
           <div class="metric-big">
             <div class="metric-label">Gap remaining</div>
@@ -531,7 +533,7 @@
     });
   }
   
-  async function loadImportantItems() {
+  async function ImportantItems() {
     const { data, error } = await supabaseClient
       .from("metiche_important_items")
       .select("id, person, item, created_at")
@@ -540,7 +542,7 @@
       .limit(5);
   
     if (error) {
-      console.error("Important items load failed:", error);
+      console.error("Important items  failed:", error);
       return;
     }
   
@@ -574,6 +576,46 @@
       container.appendChild(div);
     });
   }
+
+  async function loadChismeQueue() {
+  const today = new Date().toISOString().slice(0, 10);
+
+  const { data, error } = await supabaseClient
+    .from("chisme_communication_queue")
+    .select("id, status, bucket, reason, priority, chisme_contacts(name)")
+    .eq("queue_date", today)
+    .order("priority", { ascending: true });
+
+  if (error) {
+    console.error("Chisme queue load failed:", error);
+    return;
+  }
+
+  const rows = data || [];
+  const total = rows.length;
+  const done = rows.filter(x => x.status === "done").length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById("chisme-progress").textContent = `${done} / ${total}`;
+  document.getElementById("chisme-bar").style.setProperty("--p", `${pct}%`);
+
+  const nextRows = rows.filter(x => x.status === "queued").slice(0, 2);
+
+  const first = nextRows[0];
+  const second = nextRows[1];
+
+  document.getElementById("chisme-next-1").textContent =
+    first ? `☎ Next: ${first.chisme_contacts?.name || "Unknown"}` : "☎ Next: none";
+
+  document.getElementById("chisme-next-1-sub").textContent =
+    first ? `${first.bucket} — ${first.reason}` : "No queued customer communication.";
+
+  document.getElementById("chisme-next-2").textContent =
+    second ? `☎ Next: ${second.chisme_contacts?.name || "Unknown"}` : "☎ Next: none";
+
+  document.getElementById("chisme-next-2-sub").textContent =
+    second ? `${second.bucket} — ${second.reason}` : "No queued customer communication.";
+}
   
   async function loadMeticheSchedule() {
     const { data, error } = await supabaseClient
@@ -613,15 +655,17 @@
   }
 
    window.addEventListener("DOMContentLoaded", () => {
-    loadMeticheSchedule();
-    loadImportantItems();
+  loadMeticheSchedule();
+  loadImportantItems();
+  loadChismeQueue();
 
-    setInterval(loadMeticheSchedule, 60000);
-    setInterval(loadImportantItems, 60000);
+  setInterval(loadMeticheSchedule, 60000);
+  setInterval(loadImportantItems, 60000);
+  setInterval(loadChismeQueue, 60000);
 
-    setInterval(() => {
-        location.reload();
-    }, 300000); // 5 minutes
+  setInterval(() => {
+    location.reload();
+  }, 300000);
 });
 </script>  
 </body>
