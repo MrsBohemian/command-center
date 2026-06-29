@@ -355,6 +355,112 @@
     object-fit: contain;
     display: block;
 }
+
+.stovetop-card h2 { color: var(--orange); }
+
+.burner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.burner {
+  min-height: 95px;
+  border-radius: 16px;
+  padding: 12px;
+  background: radial-gradient(circle at center, rgba(255,255,255,.10), rgba(0,0,0,.28));
+  border: 1px solid rgba(255,255,255,.16);
+  box-shadow: inset 0 0 22px rgba(255,255,255,.05);
+}
+
+.burner.front-right { border-color: var(--red); box-shadow: 0 0 18px rgba(255,92,122,.22); }
+.burner.front-left { border-color: var(--orange); box-shadow: 0 0 18px rgba(255,140,66,.20); }
+.burner.back-right { border-color: var(--yellow); }
+.burner.back-left { border-color: var(--cyan); }
+
+.burner-label {
+  color: var(--muted);
+  font-size: .62rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+}
+
+.burner-name {
+  margin-top: 8px;
+  font-size: clamp(.95rem, 1.25vw, 1.25rem);
+  font-weight: 950;
+  color: var(--ink);
+}
+
+.burner-note {
+  margin-top: 6px;
+  color: var(--yellow);
+  font-size: .68rem;
+  font-weight: 900;
+}
+
+.financial-engine h2 { color: var(--green); }
+
+.fuel-card,
+.gear-card {
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(0,0,0,.22);
+  border-radius: 16px;
+  padding: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.fuel-label {
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: .66rem;
+  font-weight: 900;
+}
+
+.fuel-percent {
+  font-size: clamp(2.2rem, 4vw, 4.5rem);
+  line-height: .9;
+  color: var(--green);
+  font-weight: 950;
+  margin-top: 8px;
+}
+
+.fuel-money {
+  margin-top: 8px;
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--ink);
+}
+
+.gear-row {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.gear-row span {
+  text-align: center;
+  padding: 10px 0;
+  border-radius: 12px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  color: var(--muted);
+  font-size: 1.4rem;
+  font-weight: 950;
+}
+
+.gear-row span.active {
+  color: #000;
+  background: var(--green);
+  box-shadow: 0 0 16px rgba(102,242,154,.32);
+}
+    
   </style>
 </head>
   
@@ -454,36 +560,44 @@
       </section>
 
       <aside class="stack right-stack">
-        <section class="nav-card panel">
-          <h2>Navigation Dashboard <span class="source-tag">Weekly</span></h2>
-          <div class="metric-big">
-            <div class="metric-label">Weekly target</div>
-            <div class="metric-value cyan" id="weekly-target">$0</div>
-            <div class="metric-note">Target can be modified in !mgoals.</div>
+       <section class="nav-card panel financial-engine">
+        <h2>Financial Engine <span class="source-tag">Crudobot</span></h2>
+      
+        <div class="fuel-card">
+          <div class="fuel-label">Fuel Gauge</div>
+          <div class="fuel-percent" id="fuel-percent">0%</div>
+          <div class="fuel-money">
+            <span id="booked-amount">$0</span> / <span id="weekly-target">$0</span>
           </div>
-          <div class="metric-big">
-            <div class="metric-label">Booked / expected this week</div>
-            <div class="metric-value green" id="booked-amount">$0</div>
-            <div class="bar"><div id="booked-bar" style="--p:0%"></div></div>
+          <div class="loadbar">
+            <div id="booked-bar" style="--p:0%"></div>
           </div>
-          <div class="metric-big">
-            <div class="metric-label">Gap remaining</div>
-            <div class="metric-value red" id="gap-remaining">$0</div>
-            <div class="metric-note">This determines whether the week needs leads, estimates, or collections.</div>
+          <div class="metric-note">Gap remaining: <span id="gap-remaining">$0</span></div>
+        </div>
+      
+        <div class="gear-card">
+          <div class="metric-label">Financial Gear</div>
+          <div class="gear-row">
+            <span id="gear-r">R</span>
+            <span id="gear-n">N</span>
+            <span id="gear-d">D</span>
+            <span id="gear-od">OD</span>
           </div>
-          <div class="metric-big">
-            <div class="metric-label">Runway created after gap closes</div>
-            <div class="metric-value cyan" id="runway-weeks">0 weeks</div>
-            <div class="metric-note">How much pressure gets pushed off next week.</div>
-          </div>
-          <div class="metric-big">
-            <div class="metric-label">Average Job Value</div>
-            <div class="metric-value" id="average-job-value">$0</div>
-            <div class="metric-note">
-            Moving average from completed Handley Man jobs.
-            </div>
-          </div>
-        </section>
+          <div class="metric-note" id="gear-note">Waiting for weekly numbers.</div>
+        </div>
+      
+        <div class="metric-big">
+          <div class="metric-label">Cruise Control</div>
+          <div class="metric-value cyan" id="runway-weeks">0 weeks</div>
+          <div class="metric-note">Runway created after gap closes.</div>
+        </div>
+      
+        <div class="metric-big">
+          <div class="metric-label">Average Job Value</div>
+          <div class="metric-value" id="average-job-value">$0</div>
+          <div class="metric-note">Moving average from completed Handley Man jobs.</div>
+        </div>
+      </section>
       </aside>
     </section>
 
@@ -667,6 +781,29 @@
     
     const bookedPct = target > 0 ? Math.min(100, Math.round((booked / target) * 100)) : 0;
     document.getElementById("booked-bar").style.setProperty("--p", bookedPct + "%");
+
+    document.getElementById("fuel-percent").textContent = bookedPct + "%";
+
+    ["gear-r", "gear-n", "gear-d", "gear-od"].forEach(id => {
+      document.getElementById(id).classList.remove("active");
+    });
+    
+    let gear = "gear-r";
+    let note = "Reverse — weekly gap is still heavy.";
+    
+    if (bookedPct >= 100) {
+      gear = "gear-od";
+      note = "Overdrive — surplus is creating runway.";
+    } else if (bookedPct >= 70) {
+      gear = "gear-d";
+      note = "Drive — the week is moving.";
+    } else if (bookedPct >= 40) {
+      gear = "gear-n";
+      note = "Neutral — survival mode, needs action.";
+    }
+    
+    document.getElementById(gear).classList.add("active");
+    document.getElementById("gear-note").textContent = note;
 
     renderPersonSchedule("heaven-schedule", calendar.Heaven || {});
     renderPersonSchedule("daniel-schedule", calendar.Daniel || {});
